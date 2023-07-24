@@ -27,10 +27,9 @@ export interface Login {
 }
 
 export interface RegisterReturn {
-    emailError?: boolean;
-    phoneError?: boolean;
     id?: ObjectId,
-    success?: boolean
+    success: boolean
+    message?:string;
 }
 
 export interface LoginReturn {

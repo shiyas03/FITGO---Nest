@@ -19,80 +19,86 @@ export class UsersService {
     ) { }
 
     async registerUser(user: Users): Promise<RegisterReturn> {
-        try {
-            const { name, email, phone, password } = user
-            const usedEmail = await this.userModel.findOne({ email: email })
-            const usedPhone = await this.userModel.findOne({ phone: phone })
-            if (usedEmail) {
-                if (usedEmail.access == true) {
-                    return { emailError: true }
-                } else {
-                    if (usedPhone && usedPhone.email !== email) {
-                        return { phoneError: true }
-                    } else {
-                        const hashPassowrd = await argon.hash(password);
-                        const data = await this.userModel.findOneAndUpdate({ email: email },
-                            {
-                                $set: {
-                                    name: name,
-                                    phone: phone,
-                                    password: hashPassowrd
-                                }
-                            })
-                        return { success: true, id: data._id }
-                    }
-                }
-            } else if (usedPhone && usedPhone.email !== email) {
-                return { phoneError: true }
+      try {
+        const { name, email, phone, password } = user;
+        const usedEmail = await this.userModel.findOne({
+          email: { $regex: new RegExp("^" + email + "$", "i") },
+        })
+        const usedPhone = await this.userModel.findOne({ phone: phone });
+        if (usedEmail) {
+          if (usedEmail.access == true) {
+            return { success: false, message: "Email already used" };
+          } else {
+            if (usedPhone && usedPhone.email !== email) {
+              return { success: false, message: "Phone number already used" };
             } else {
-                const hashPassowrd = await argon.hash(password);
-                const newUser = new this.userModel({
+              const hashPassowrd = await argon.hash(password);
+              const data = await this.userModel.findOneAndUpdate(
+                { email: email },
+                {
+                  $set: {
                     name: name,
-                    email: email,
                     phone: phone,
-                    password: hashPassowrd
-                })
-                await newUser.save()
-                return { success: true, id: newUser._id }
+                    password: hashPassowrd,
+                  },
+                }
+              );
+              return { success: true, id: data._id };
             }
-        } catch (error) {
-            // console.log(error)
-            // return { error }
+          }
+        } else if (usedPhone && usedPhone.email !== email) {
+          return { success: false, message: "Phone number already used" };
+        } else {
+          const hashPassowrd = await argon.hash(password);
+          const newUser = new this.userModel({
+            name: name,
+            email: email,
+            phone: phone,
+            password: hashPassowrd,
+          });
+          await newUser.save();
+          return { success: true, id: newUser._id };
         }
+      } catch (error) {
+        console.log(error);
+        throw new Error(error);
+      }
     }
-
-    async sendMail(id: string) {
-        try {
-
-            let template: HandlebarsTemplateDelegate<{ otp: string }>;
-            const templatePath = 'src/helpers/mail-templates/otp-template.hbs';
-            const templateContent = fs.readFileSync(templatePath, 'utf8');
-            template = handlebars.compile(templateContent);
-
-            const objectId = new mongoose.Types.ObjectId(id);
-            const data = await this.userModel.findOne({ _id: objectId }, { email: 1 });
-
-            const chars = '0123456789';
-            let otp: string = ''
-
-            for (let i = 0; i < 6; i++) {
-                const randomIndex = Math.floor(Math.random() * chars.length);
-                otp += chars[randomIndex];
-            }
-
-            const htmlContent = template({ otp: otp });
-            this.mailService.sendMail({
-                to: <string>data.email,
-                from: 'ffitgo@gmail.com',
-                subject: 'otp for authentication',
-                text: 'Hello Welcome!',
-                html: htmlContent
-            })
-            return { success: true, otp: otp }
-        } catch (error) {
-            console.log(error)
-            // return { error }
+  
+    async sendMail(id: string): Promise<{ success: boolean; otp: string }> {
+      try {
+        let template: HandlebarsTemplateDelegate<{ otp: string }>;
+        const templatePath = "src/helpers/mail-templates/otp-template.hbs";
+        const templateContent = fs.readFileSync(templatePath, "utf8");
+        template = handlebars.compile(templateContent);
+  
+        const objectId = new mongoose.Types.ObjectId(id);
+        const data = await this.userModel.findOne(
+          { _id: objectId },
+          { email: 1 }
+        );
+  
+        const chars = "0123456789";
+        let otp: string = "";
+  
+        for (let i = 0; i < 6; i++) {
+          const randomIndex = Math.floor(Math.random() * chars.length);
+          otp += chars[randomIndex];
         }
+  
+        const htmlContent = template({ otp: otp });
+        await this.mailService.sendMail({
+          to: <string>data.email,
+          from: "ffitgo@gmail.com",
+          subject: "otp for authentication",
+          text: "Hello Welcome!",
+          html: htmlContent,
+        });
+        return { success: true, otp: otp };
+      } catch (error) {
+        console.log(error);
+        throw Error("Failed to send email");
+      }
     }
 
     async verifyOTP(details: { id: string, access: boolean }) {
