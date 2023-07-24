@@ -1,70 +1,69 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
-export type userDocument = Users & Document
+export type userDocument = Users & Document;
 
-@Schema({ collection: 'users' })
+@Schema({ collection: "users" })
 export class Users {
+  @Prop()
+  name: string;
 
-    @Prop()
-    name: string;
+  @Prop()
+  email: string;
 
-    @Prop()
-    email: string;
+  @Prop()
+  phone: number;
 
-    @Prop()
-    phone: number;
+  @Prop()
+  password: string;
 
-    @Prop()
-    password: string;
+  @Prop()
+  age: number;
 
-    @Prop()
-    age: number;
+  @Prop()
+  height: number;
 
-    @Prop()
-    height: number;
+  @Prop()
+  weight: number;
 
-    @Prop()
-    weight: number;
+  @Prop()
+  goal: string;
 
-    @Prop()
-    goal: string;
+  @Prop()
+  goalWeight: number;
 
-    @Prop()
-    goalWeight: number;
+  @Prop()
+  months: number;
 
-    @Prop()
-    months: number;
+  @Prop()
+  gender: string;
 
-    @Prop()
-    gender: string;
+  @Prop()
+  activity: string;
 
-    @Prop()
-    activity: string;
+  @Prop()
+  caloriesBurn: number;
 
-    @Prop()
-    caloriesBurn: number;
+  @Prop()
+  caloriesNeed: number;
 
-    @Prop()
-    caloriesNeed: number;
+  @Prop()
+  imageUrl: string;
 
-    @Prop()
-    imageUrl: string;
+  @Prop({ type: { amount: { type: Number }, paidDate: { type: Date } } })
+  fee: {
+    amount: number;
+    paidDate: Date;
+  };
 
-    @Prop({ type: { amount: { type: Number }, paidDate: { type: Date }}})
-    fee: {
-        amount: number;
-        paidDate: Date;
-    };
+  @Prop()
+  feedback: string;
 
-    @Prop()
-    feedback: string;
+  @Prop({ type: Boolean, default: false })
+  access: Boolean;
 
-    @Prop({ type: Boolean, default: false })
-    access: Boolean;
-
-    @Prop({ default: Date.now })
-    joinDate: Date;
+  @Prop({ default: Date.now })
+  joinDate: Date;
 }
 
-export const UsersSchema = SchemaFactory.createForClass(Users)
+export const UsersSchema = SchemaFactory.createForClass(Users);
