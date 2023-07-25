@@ -149,10 +149,14 @@ export class UsersService {
     }
   }
 
-  async userDetails(details: UserDetails): Promise<{ success: boolean; token: string; }> {
+  async userDetails(
+    details: UserDetails
+  ): Promise<{ success: boolean; token: string }> {
     try {
       const id = details.id;
-      const data = await this.userModel.findOneAndUpdate({ _id: id },{
+      const data = await this.userModel.findOneAndUpdate(
+        { _id: id },
+        {
           $set: {
             age: details.age,
             height: details.height,
@@ -168,22 +172,24 @@ export class UsersService {
           },
         }
       );
-      if(data){
+      if (data) {
         const paylaod = { sub: data._id, email: data.email };
         const token = await this.jwtService.signAsync(paylaod);
         return { success: true, token: token };
-      }else{
-        throw new Error("couldn't find data")
+      } else {
+        throw new Error("couldn't find data");
       }
     } catch (error) {
       console.log(error);
-      throw new Error(error)
+      throw new Error(error);
     }
   }
 
   async verifyLogin(details: Login): Promise<LoginReturn> {
     try {
-      const data = await this.userModel.findOne({ email: { $regex: new RegExp("^" + details.email + "$", "i") } });
+      const data = await this.userModel.findOne({
+        email: { $regex: new RegExp("^" + details.email + "$", "i") },
+      });
       if (data) {
         if (data.access == true) {
           const paylaod = { sub: data._id, email: data.email };
@@ -192,7 +198,9 @@ export class UsersService {
             data.password,
             details.password
           );
-          return verifyPass? { token: token, id: data._id }: { message: "Incorrect password" };
+          return verifyPass
+            ? { token: token, id: data._id }
+            : { message: "Incorrect password" };
         } else {
           return { message: "Access denied" };
         }
@@ -200,8 +208,8 @@ export class UsersService {
         return { message: "Email not found" };
       }
     } catch (error) {
-      console.log(error)
-      throw new Error(error)
+      console.log(error);
+      throw new Error(error);
     }
   }
 
@@ -216,10 +224,11 @@ export class UsersService {
       if (data) {
         return data;
       } else {
-        throw new Error();
+        throw new Error("couldn't find user details")
       }
     } catch (error) {
-      // console.log(error);
+      console.log(error);
+      throw new Error(error)
     }
   }
 
@@ -237,10 +246,11 @@ export class UsersService {
       if (data) {
         return { success: true };
       } else {
-        return { success: false };
+        throw new Error("could't find user profile")
       }
     } catch (error) {
       console.log(error);
+      throw new Error(error)
     }
   }
 
@@ -286,10 +296,11 @@ export class UsersService {
       if (data) {
         return { success: true };
       } else {
-        return { success: false };
+        throw new Error("Couldn't find user details")
       }
     } catch (error) {
       console.log(error);
+      throw new Error(error)
     }
   }
 }
