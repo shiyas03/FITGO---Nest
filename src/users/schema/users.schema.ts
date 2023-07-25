@@ -47,23 +47,6 @@ export class Users {
   @Prop()
   caloriesNeed: number;
 
-<<<<<<< HEAD
-  @Prop()
-  imageUrl: string;
-
-  @Prop({ type: { amount: { type: Number }, paidDate: { type: Date } } })
-  fee: {
-    amount: number;
-    paidDate: Date;
-  };
-
-  @Prop()
-  feedback: string;
-
-  @Prop({ type: Boolean, default: false })
-  access: Boolean;
-
-=======
   @Prop({ default: false })
   isUpload: boolean;
 
@@ -82,7 +65,6 @@ export class Users {
   @Prop({ type: Boolean, default: false })
   access: Boolean;
 
->>>>>>> b318a1c403f2b1e59c7b484a0952435f94796858
   @Prop({ default: Date.now })
   joinDate: Date;
 }
