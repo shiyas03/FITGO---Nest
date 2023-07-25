@@ -122,7 +122,7 @@ export class UsersService {
         );
         return { success: true };
       }
-      throw new Error("Couldn't find data");
+      throw new Error("Couldn't verify OTP");
     } catch (error) {
       console.log(error);
       throw new Error(error);
@@ -141,10 +141,10 @@ export class UsersService {
       if (userData) {
         return userData;
       } else {
-        throw Error;
+        throw new NotFoundException("Not found user details");
       }
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       throw new NotFoundException(error);
     }
   }
@@ -192,7 +192,7 @@ export class UsersService {
       });
       if (data) {
         if (data.access == true) {
-          const paylaod = { sub: data._id, email: data.email };
+          const paylaod = { id: data._id, email: data.email };
           const token = await this.jwtService.signAsync(paylaod);
           const verifyPass = await argon.verify(
             data.password,
@@ -224,11 +224,11 @@ export class UsersService {
       if (data) {
         return data;
       } else {
-        throw new Error("couldn't find user details")
+        throw new Error("couldn't find user details");
       }
     } catch (error) {
       console.log(error);
-      throw new Error(error)
+      throw new Error(error);
     }
   }
 
@@ -246,11 +246,11 @@ export class UsersService {
       if (data) {
         return { success: true };
       } else {
-        throw new Error("could't find user profile")
+        throw new Error("could't find user profile");
       }
     } catch (error) {
       console.log(error);
-      throw new Error(error)
+      throw new Error(error);
     }
   }
 
@@ -296,11 +296,11 @@ export class UsersService {
       if (data) {
         return { success: true };
       } else {
-        throw new Error("Couldn't find user details")
+        throw new Error("Couldn't find user details");
       }
     } catch (error) {
       console.log(error);
-      throw new Error(error)
+      throw new Error(error);
     }
   }
 }
