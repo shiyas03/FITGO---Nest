@@ -35,7 +35,8 @@ export interface RegisterReturn {
 export interface LoginReturn {
     error?:string
     token?: string,
-    id?:string
+    id?:string,
+    message?:string
 }
 
 export interface UserData {
