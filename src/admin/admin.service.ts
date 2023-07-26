@@ -11,7 +11,6 @@ import { MailerService } from '@nestjs-modules/mailer';
 import * as fs from 'fs';
 import * as handlebars from 'handlebars';
 
-
 @Injectable()
 export class AdminService {
 
@@ -22,19 +21,19 @@ export class AdminService {
         private readonly mailService: MailerService,
     ) { }
 
-    async verifyAdmin(adminData: Admin): Promise<{ token?: string, error?: string }> {
+    async verifyAdmin(adminData: Admin): Promise<{ token?: string, message?: string }> {
         try {
             const data = await this.adminModel.findOne({ email: adminData.email })
             if (data) {
                 const verifyPassword = await argon.verify(data.password, adminData.password);
-                const payload = { sub: data._id, email: data.email }
+                const payload = { id: data._id, email: data.email }
                 const token = await this.jwtService.signAsync(payload)
-                return verifyPassword ? { token: token } : { error: "password" };
+                return verifyPassword ? { token: token } : { message: "Incorrect Password" };
             }
-            return { error: "email" }
+            return { message: "Email not found" }
         } catch (error) {
             console.log(error)
-            // return { error }
+            throw new Error(error)
         }
     }
 
@@ -44,7 +43,7 @@ export class AdminService {
             return datas
         } catch (error) {
             console.log(error);
-            return [error]
+            throw new Error(error);
         }
     }
 
@@ -58,7 +57,7 @@ export class AdminService {
             }
         } catch (error) {
             console.log(error);
-            // return { error }
+            throw new Error(error);
         }
     }
 
@@ -70,7 +69,7 @@ export class AdminService {
             }
         } catch (error) {
             console.log(error);
-
+            throw new Error(error);
         }
     }
 
@@ -102,7 +101,8 @@ export class AdminService {
                 return { success: false }
             }
         } catch (error) {
-
+            console.log(error);
+            throw new Error(error)
         }
     }
 
@@ -120,7 +120,7 @@ export class AdminService {
             }
         } catch (error) {
             console.log(error);
-
+            throw new Error(error);
         }
     }
 } 

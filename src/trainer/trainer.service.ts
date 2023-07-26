@@ -11,19 +11,19 @@ export class TrainerService {
 
     constructor(@InjectModel('Trainer') private trainerModel: Model<TrainerModel>, private jwtService: JwtService) { }
 
-    async verifyTrainer(trainer: Trainer): Promise<{ token?: string, error?: string }> {
+    async verifyTrainer(trainer: Trainer): Promise<{ token?: string, message?: string }> {
         try {
             const data = await this.trainerModel.findOne({ email: trainer.email })
             if (data && data.access == true) {
                 const verifyPassword = await argon.verify(data.password, trainer.password)
                 const paylaod = { sub: data._id, email: data.email }
                 const token = await this.jwtService.signAsync(paylaod)
-                return verifyPassword ? { token: token } : { error: 'password' }
+                return verifyPassword ? { token: token } : { message: 'Incorrect password' }
             }
-            return { error: "email" }
+            return { message: "Email not found" }
         } catch (error) {
             console.log(error);
-            // return { error }
+            throw new Error(error)
         }
     }
 
@@ -44,7 +44,7 @@ export class TrainerService {
             }
         } catch (error) {
             console.log(error);
-            // return { error }
+            throw new Error(error)
         }
     }
 
@@ -68,7 +68,7 @@ export class TrainerService {
         }
         catch (error) {
             console.log(error)
-            // return { error }
+            throw new Error(error)
         }
     }
 }

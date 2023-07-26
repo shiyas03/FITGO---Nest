@@ -5,6 +5,9 @@ import { InjectModel } from "@nestjs/mongoose";
 import * as argon from "argon2";
 import { MailerService } from "@nestjs-modules/mailer";
 import { JwtService } from "@nestjs/jwt";
+import mongoose from "mongoose";
+import * as fs from "fs";
+import * as handlebars from "handlebars";
 import {
   Login,
   LoginReturn,
@@ -14,9 +17,6 @@ import {
   Profile,
   UpdateDetails,
 } from "./user.interface";
-import mongoose from "mongoose";
-import * as fs from "fs";
-import * as handlebars from "handlebars";
 
 @Injectable()
 export class UsersService {
@@ -144,7 +144,6 @@ export class UsersService {
         throw new NotFoundException("Not found user details");
       }
     } catch (error) {
-      console.log(error);
       throw new NotFoundException(error);
     }
   }

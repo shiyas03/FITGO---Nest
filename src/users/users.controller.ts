@@ -31,8 +31,8 @@ export class UsersController {
   }
 
   @Get("user")
-  async fetchUser(@Query() data: { id: string }) {
-    return this.userService.fetchUser(data.id);
+  async fetchUser(@Query("id") id: string) {
+    return this.userService.fetchUser(id);
   }
 
   @Post("verify-otp")
@@ -51,7 +51,7 @@ export class UsersController {
   }
 
   @Get("profile/:id")
-  async fetchProfileDetails(@Param("id") id: string) {
+  async fetchProfileDetails(@Param('id') id: string) {
     return this.userService.fetchProfileDetails(id);
   }
 
