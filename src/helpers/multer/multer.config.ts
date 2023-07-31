@@ -2,6 +2,8 @@
 import { MulterModuleOptions } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+import * as sharp from "sharp";
+
 
 export const multerMutipleConfig: MulterModuleOptions = {
   storage: diskStorage({
@@ -15,3 +17,11 @@ export const multerMutipleConfig: MulterModuleOptions = {
   }),
 };
 
+export async function cropImage(file: Express.Multer.File, size: number[]) {
+  const image = sharp(file.path);
+  const croppedImageBuffer = await image
+    .resize(size[0], size[1])
+    .toBuffer();
+  const outputPath = `./uploads/${file.filename}`;
+  await sharp(croppedImageBuffer).toFile(outputPath);
+}

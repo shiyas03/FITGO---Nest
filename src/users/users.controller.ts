@@ -14,7 +14,6 @@ import { UsersService } from "./users.service";
 import { Users } from "./schema/users.schema";
 import { Login, UpdateDetails, UserDetails } from "./user.interface";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { log } from "handlebars/runtime";
 
 @Controller("")
 export class UsersController {

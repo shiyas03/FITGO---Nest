@@ -1,74 +1,158 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { TrainerModel } from './schema/trainer.schema';
-import { JwtService } from '@nestjs/jwt';
-import { Files, Register, Trainer } from './trainer.interface'
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import mongoose, { Model } from "mongoose";
+import { TrainerModel } from "./schema/trainer.schema";
+import { JwtService } from "@nestjs/jwt";
+import { Files, Profile, Register, Trainer, fetchTrainers } from "./trainer.interface";
 import * as argon from "argon2";
 
 @Injectable()
 export class TrainerService {
+  constructor(
+    @InjectModel("Trainer") private trainerModel: Model<TrainerModel>,
+    private jwtService: JwtService
+  ) { }
 
-    constructor(@InjectModel('Trainer') private trainerModel: Model<TrainerModel>, private jwtService: JwtService) { }
-
-    async verifyTrainer(trainer: Trainer): Promise<{ token?: string, message?: string }> {
-        try {
-            const data = await this.trainerModel.findOne({ email: trainer.email })
-            if (data && data.access == true) {
-                const verifyPassword = await argon.verify(data.password, trainer.password)
-                const paylaod = { sub: data._id, email: data.email }
-                const token = await this.jwtService.signAsync(paylaod)
-                return verifyPassword ? { token: token } : { message: 'Incorrect password' }
-            }
-            return { message: "Email not found" }
-        } catch (error) {
-            console.log(error);
-            throw new Error(error)
-        }
+  async verifyTrainer(
+    trainer: Trainer
+  ): Promise<{ token?: string; message?: string }> {
+    try {
+      const data = await this.trainerModel.findOne({ email: trainer.email });
+      if (data && data.access == true) {
+        const verifyPassword = await argon.verify(
+          data.password,
+          trainer.password
+        );
+        const paylaod = { id: data._id, email: data.email, name: data.name };
+        const token = await this.jwtService.signAsync(paylaod);
+        return verifyPassword
+          ? { token: token }
+          : { message: "Incorrect password" };
+      } else if (data.isUpload == true) {
+        return { message: "Access resticted" }
+      }
+      return { message: "Email not found" };
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
     }
+  }
 
-    async register(details: Register): Promise<{ email?: boolean, id?: string }> {
-        try {
-            const data = await this.trainerModel.findOne({ email: details.email })
-            if (data && data.isUpload) {
-                return { email: true }
-            } else {
-                const hashPassowrd = await argon.hash(details.password);
-                const newTrianer = new this.trainerModel({
-                    name: details.name,
-                    email: details.email,
-                    password: hashPassowrd
-                })
-                await newTrianer.save();
-                return { id: newTrianer._id }
-            }
-        } catch (error) {
-            console.log(error);
-            throw new Error(error)
-        }
+  async register(details: Register): Promise<{ email?: boolean; id?: string }> {
+    try {
+      const data = await this.trainerModel.findOne({ email: details.email });
+      if (data && data.isUpload) {
+        return { email: true };
+      } else {
+        const hashPassowrd = await argon.hash(details.password);
+        const newTrianer = new this.trainerModel({
+          name: details.name,
+          email: details.email,
+          phone: details.phone,
+          password: hashPassowrd,
+        });
+        await newTrianer.save();
+        return { id: newTrianer._id };
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
     }
+  }
 
-    async detailsUpload(about: string, cv: Files, certificates: Files[], id: string): Promise<{ success: boolean, email?: string }> {
-        try {
-            let documents = certificates.map((data) => data.filename)
-            const data = await this.trainerModel.findOneAndUpdate({ _id: id },
-                {
-                    $set: {
-                        about: about,
-                        cv: cv.filename,
-                        certificate: documents,
-                        isUpload: true
-                    }
-                })
-            if (data) {
-                return { success: true, email: data.email }
-            } else {
-                return { success: false }
-            }
+  async detailsUpload(
+    details: string[],
+    cv: Files,
+    certificates: Files[],
+    id: string
+  ): Promise<{ success: boolean; email?: string }> {
+    try {
+      let documents = certificates.map((data) => data.filename);
+      const data = await this.trainerModel.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            experience: details[0],
+            specialized: details[1],
+            about: details[2],
+            cv: cv.filename,
+            certificate: documents,
+            isUpload: true,
+          },
         }
-        catch (error) {
-            console.log(error)
-            throw new Error(error)
-        }
+      );
+      if (data) {
+        return { success: true, email: data.email };
+      } else {
+        return { success: false };
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
     }
+  }
+
+  async getAccess(id: string): Promise<{ access: boolean }> {
+    try {
+      const data = await this.trainerModel.findOne({ _id: id }, { access: 1, _id: 0 })
+      if (!data) {
+        throw new NotFoundException("Details not found");
+      }
+      return data
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async fetchProfileDetails(id: string): Promise<Profile> {
+    try {
+      const data = await this.trainerModel.findOne(
+        { _id: id },
+        { certificate: 0, cv: 0, _id: 0 }
+      );
+      if (!data) {
+        throw new NotFoundException('Details not found');
+      }
+      return data
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async uploadProfile(profile: Express.Multer.File, id: string) {
+    try {
+      const objectId = new mongoose.Types.ObjectId(id);
+      const data = await this.trainerModel.findOneAndUpdate(
+        { _id: objectId },
+        {
+          $set: {
+            imageUrl: profile.filename,
+          },
+        }
+      );
+      if (data) {
+        return { success: true };
+      } else {
+        throw new Error("could't find trainer profile");
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async fetchAllTrainers(): Promise<fetchTrainers[]> {
+    try {
+      const data = await this.trainerModel.find({}, { cv: 0, certificate: 0, __v: 0, password:0 })
+      if (!data) {
+        throw new Error("could't find trainers");
+      }
+      return data
+    } catch (error) {
+      console.log(error);
+      throw new Error(error)
+    }
+  }
 }

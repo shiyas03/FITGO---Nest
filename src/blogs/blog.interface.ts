@@ -16,6 +16,10 @@ export interface Blogs {
     trainerId: {
       _id: string;
       name: string;
+      experience:number,
+      specialized:string,
+      about:string;
+      imageUrl:string
     };
     approve: boolean;
   }

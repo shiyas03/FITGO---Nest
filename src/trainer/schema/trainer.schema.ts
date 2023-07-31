@@ -12,7 +12,16 @@ export class Trainer {
     email: string
 
     @Prop()
+    phone: number
+
+    @Prop()
     password: string
+
+    @Prop()
+    experience: number
+
+    @Prop()
+    specialized: string
 
     @Prop()
     about: string
@@ -23,17 +32,20 @@ export class Trainer {
     @Prop()
     certificate: string[]
 
+    @Prop()
+    imageUrl: string
+
     @Prop({ type: Boolean, default: false })
     isUpload: boolean
 
     @Prop({ type: Boolean, default: false })
-    approve:boolean
+    approve: boolean
 
     @Prop({ type: Boolean, default: false })
     access: boolean
 
     @Prop()
-    joinDate : Date
+    joinDate: Date
 }
 
 export const TrainerSchema = SchemaFactory.createForClass(Trainer);

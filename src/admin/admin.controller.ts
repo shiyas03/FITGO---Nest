@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { Admin } from './admin.interface';
+import { Response } from 'express';
+import { join } from 'path';
 
 
 @Controller('admin')
@@ -36,5 +38,11 @@ export class AdminController {
     @Patch('trainer-access')
     async updateTrainerAccess(@Body() details: { id: string, access: boolean }) {
         return this.adminService.updateTrainerAccess(details)
+    }
+
+    @Get('trainer/documents/:filename')
+    async serveFile(@Param('filename') filename: string, @Res() res: Response) {
+        const filePath = join(process.cwd(), 'uploads', filename);
+        res.sendFile(filePath);
     }
 }

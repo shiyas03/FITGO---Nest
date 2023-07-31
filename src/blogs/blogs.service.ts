@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { BlogModel } from "./schema/blog.schema";
 import mongoose, { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { Blog, Blogs } from "./blog.interface";
+import { Blogs } from "./blog.interface";
 
 @Injectable()
 export class BlogsService {
@@ -24,6 +24,7 @@ export class BlogsService {
         blog: blog,
         template: details.filename,
         trainerId: objectId,
+        publishedDate: Date.now()
       });
       await newBlog.save();
       return { success: true };
@@ -38,7 +39,7 @@ export class BlogsService {
       const data = <Blogs[]>(
         await this.blogModel
           .find({}, { __v: 0 })
-          .populate("trainerId", "name")
+          .populate("trainerId")
       );
       return data ? data : [];
     } catch (error) {
@@ -65,4 +66,6 @@ export class BlogsService {
       throw new Error(error);
     }
   }
+
+
 }

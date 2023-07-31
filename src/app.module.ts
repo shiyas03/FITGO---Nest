@@ -35,20 +35,4 @@ import { JwtModule } from "@nestjs/jwt";
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(JwtMiddleware)
-      .exclude(
-        "login",
-        "register",
-        "details",
-        "otp",
-        "admin/login",
-        "trainer/login",
-        "trainer/register",
-        "trainer/details"
-      )
-      .forRoutes("*");
-  }
-}
+export class AppModule {}

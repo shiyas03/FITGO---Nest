@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BlogSchema } from './schema/blog.schema';
 import { MulterModule } from '@nestjs/platform-express';
 import { multerMutipleConfig } from '../helpers/multer/multer.config';
-import { TrainerSchema } from '../trainer/schema/trainer.schema';
+import { UsersSchema } from '../users/schema/users.schema';
 
 @Module({
   imports: [
@@ -13,6 +13,10 @@ import { TrainerSchema } from '../trainer/schema/trainer.schema';
       name: 'Blogs',
       schema: BlogSchema,
       collection: 'blogs'
+    },{
+      name: 'Users',
+      schema: UsersSchema,
+      collection: 'users'
     }]),
     MulterModule.register(multerMutipleConfig)
   ],
