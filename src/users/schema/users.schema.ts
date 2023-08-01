@@ -54,11 +54,13 @@ export class Users {
   @Prop()
   imageUrl: string;
 
-  @Prop({ type: { amount: { type: Number }, paidDate: { type: Date } } })
-  fee: {
+  @Prop()
+  payment: [{
     amount: number;
     paidDate: Date;
-  };
+    paymentId:string;
+    secretKey:string;
+  }];
 
   @Prop()
   feedback: string;
@@ -68,6 +70,7 @@ export class Users {
 
   @Prop({ default: Date.now })
   joinDate: Date;
+
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

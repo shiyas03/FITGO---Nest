@@ -13,10 +13,6 @@ import { UsersSchema } from '../users/schema/users.schema';
       name: 'Blogs',
       schema: BlogSchema,
       collection: 'blogs'
-    },{
-      name: 'Users',
-      schema: UsersSchema,
-      collection: 'users'
     }]),
     MulterModule.register(multerMutipleConfig)
   ],

@@ -9,6 +9,7 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { BlogsModule } from "./blogs/blog.module";
 import { JwtMiddleware } from "./helpers/middleware/jwt.middleware";
 import { JwtModule } from "@nestjs/jwt";
+import { WorkoutsModule } from './workouts/workouts.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { JwtModule } from "@nestjs/jwt";
     TrainerModule,
     BlogsModule,
     AdminModule,
+    WorkoutsModule,
     MongooseModule.forRoot("mongodb://localhost:27017/fitness"),
     MailerModule.forRoot({
       transport: {
@@ -35,4 +37,20 @@ import { JwtModule } from "@nestjs/jwt";
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleware)
+    .exclude(
+      '/login',
+      '/register',
+      '/mail',
+      '/verify-otp',
+      '/user-details',
+      '/trainer/login',
+      '/trainer/register',
+      '/trainer/details',
+      '/admin/login',
+      'workouts/upload')
+      .forRoutes('*')
+  }
+} 
