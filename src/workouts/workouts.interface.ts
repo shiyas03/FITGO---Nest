@@ -12,5 +12,9 @@ export interface Workout{
     video:string;
     trainerId?:{
         name:string;
+        imageUrl:string;
+        experience:string;
+        specialized:string
     };
+    publish:boolean;
   }

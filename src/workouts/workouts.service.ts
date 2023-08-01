@@ -23,7 +23,8 @@ export class WorkoutsService {
                 overview: details[7],
                 video: files[0].filename,
                 thumbnail: files[1].filename,
-                trainerId: objectId
+                trainerId: objectId,
+                uploadDate: Date.now()
             })
             await newWorkout.save()
             return true
@@ -37,6 +38,21 @@ export class WorkoutsService {
         try {
             const data = <Workout[]>(await this.workoutModel.find({}, { __v: 0 }).populate("trainerId"))
             return data ? data : []
+        } catch (error) {
+            console.log(error);
+            throw new Error(error)
+        }
+    }
+
+    async publishChanges(id: string, change: boolean): Promise<boolean> {
+        try {
+            const objectId = new mongoose.Types.ObjectId(id)
+            await this.workoutModel.findOneAndUpdate({ _id: objectId }, {
+                $set: {
+                    publish: change
+                }
+            })
+            return true
         } catch (error) {
             console.log(error);
             throw new Error(error)

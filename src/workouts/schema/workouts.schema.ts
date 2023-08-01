@@ -39,6 +39,13 @@ export class Workout {
 
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: "Trainer" })
     trainerId: Trainer;
+
+    @Prop({ default: false })
+    publish: boolean
+
+    @Prop()
+    uploadDate: Date
+
 }
 
 export const WorkoutSchema = SchemaFactory.createForClass(Workout)
