@@ -16,6 +16,8 @@ import {
   UserDetails,
   Profile,
   UpdateDetails,
+  PaymentData,
+  Payment,
 } from "./user.interface";
 
 @Injectable()
@@ -24,7 +26,7 @@ export class UsersService {
     @InjectModel("Users") private userModel: Model<userDocument>,
     private readonly mailService: MailerService,
     private jwtService: JwtService
-  ) {}
+  ) { }
 
   async registerUser(user: Users): Promise<RegisterReturn> {
     try {
@@ -108,7 +110,7 @@ export class UsersService {
       throw Error("Failed to send email");
     }
   }
-
+ 
   async verifyOTP(details: { id: string; access: boolean }) {
     try {
       if (details.access === true && details.id) {
@@ -126,7 +128,7 @@ export class UsersService {
     } catch (error) {
       console.log(error);
       throw new Error(error);
-    }
+    } 
   }
 
   async fetchUser(id: string): Promise<UserData> {
@@ -299,6 +301,28 @@ export class UsersService {
       }
     } catch (error) {
       console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async updatePayment(details: PaymentData): Promise<boolean> {
+    try {
+      const objectId = new mongoose.Types.ObjectId(details.userId);
+      const updateData: Payment = {
+        amount: details.stripeToken.amount,
+        paidDate: new Date(),
+        secretKey: details.stripeToken.id,
+        trainerId: details.trainerId
+      }
+
+      const data = await this.userModel.findOneAndUpdate({ _id: objectId }, {
+        $set: {
+          payment: [{updateData}]
+        }
+      })
+      return true
+    } catch (error) {
+      console.log();
       throw new Error(error);
     }
   }

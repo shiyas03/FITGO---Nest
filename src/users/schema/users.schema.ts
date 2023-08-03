@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Document, Schema as MongooseSchema } from "mongoose";
+import { Trainer } from "../../trainer/schema/trainer.schema";
 
 export type userDocument = Users & Document;
 
 @Schema({ collection: "users" })
 export class Users {
-  
+
   @Prop()
   name: string;
 
@@ -54,13 +55,14 @@ export class Users {
   @Prop()
   imageUrl: string;
 
-  @Prop()
-  payment: [{
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: "Trainer" })
+  payment: Array<{
     amount: number;
     paidDate: Date;
-    paymentId:string;
-    secretKey:string;
-  }];
+    paymentId: string;
+    secretKey: string;
+    trainerId: Trainer;
+  }>;
 
   @Prop()
   feedback: string;

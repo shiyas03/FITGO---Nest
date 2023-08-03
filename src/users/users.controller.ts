@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { Users } from "./schema/users.schema";
-import { Login, UpdateDetails, UserDetails } from "./user.interface";
+import { Login, PaymentData, UpdateDetails, UserDetails } from "./user.interface";
 import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("")
@@ -71,5 +71,10 @@ export class UsersController {
   @Put("update-details")
   async updateDetails(@Body() details: UpdateDetails, @Query() id: string) {
     return this.userService.updateDetails(details, id);
+  }
+
+  @Put("payment")
+  async updatePayment(@Body() paymentData: PaymentData){
+    return this.userService.updatePayment(paymentData)
   }
 }

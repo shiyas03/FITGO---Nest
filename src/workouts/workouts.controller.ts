@@ -25,3 +25,4 @@ export class WorkoutsController {
         return this.workoutService.publishChanges(id, data.change)
     }
 }
+    
