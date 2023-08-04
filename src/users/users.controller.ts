@@ -73,8 +73,4 @@ export class UsersController {
     return this.userService.updateDetails(details, id);
   }
 
-  @Put("payment")
-  async updatePayment(@Body() paymentData: PaymentData){
-    return this.userService.updatePayment(paymentData)
-  }
 }

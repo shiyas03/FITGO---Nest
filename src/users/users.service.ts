@@ -137,7 +137,7 @@ export class UsersService {
       const userData = <UserData>(
         await this.userModel.findOne(
           { _id: objectId },
-          { name: 1, email: 1, access: 1 }
+          { name: 1, email: 1, access: 1,imageUrl:1 }
         )
       );
       if (userData) {

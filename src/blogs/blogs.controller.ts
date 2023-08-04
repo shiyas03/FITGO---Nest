@@ -14,7 +14,7 @@ import { cropImage } from "../helpers/multer/multer.config";
 
 @Controller("blogs")
 export class BlogsController {
-  constructor(private blogServices: BlogsService) {}
+  constructor(private blogServices: BlogsService) { }
 
   @Post("blog-upload")
   @UseInterceptors(FileInterceptor("details"))
@@ -23,7 +23,7 @@ export class BlogsController {
     @UploadedFile() details: Express.Multer.File,
     @Body() data: { details: string[] }
   ) {
-   cropImage(details,[800,400])
+    cropImage(details, [800, 400])
     return this.blogServices.uploadBlog(data, details, id)
   }
 

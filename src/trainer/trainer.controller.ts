@@ -1,8 +1,10 @@
-import { Body, Controller, Post, UseInterceptors, UploadedFiles, Param, Get, Patch, Query, UploadedFile } from '@nestjs/common';
+import { Body, Controller, Post, UseInterceptors, UploadedFiles, Param, Get, Patch, Query, UploadedFile, Res } from '@nestjs/common';
 import { TrainerService } from './trainer.service';
 import { Register, Trainer } from './trainer.interface';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { cropImage } from '../helpers/multer/multer.config';
+import { Response } from 'express';
+import { join } from 'path';
 
 @Controller('trainer')
 export class TrainerController {
@@ -19,18 +21,16 @@ export class TrainerController {
         return this.trainerServices.register(trainerData)
     }
 
-    @Post('details/:id')
+    @Post('details')
     @UseInterceptors(FilesInterceptor('details', 10))
     async detailsUpload(@Body('details') details: string[],
-        @UploadedFiles() file: Express.Multer.File[],
-        @Param('id') id: string) {
-        const About = details
-        const cv = file[0]
+        @UploadedFiles() files: Express.Multer.File[],
+        @Query('id') id: string) {
+        const cv = files[0]
         let certificates = []
-        for (let i = 1; i < details.length; i++) {
-            certificates.push(details[i])
-        }
-
+        for (let i = 1; i < files.length; i++) {
+            certificates.push(files[i])
+        }  
         return this.trainerServices.detailsUpload(details, cv, certificates, id)
     }
 
@@ -57,6 +57,22 @@ export class TrainerController {
     @Get('fetchAll')
     async fetchAllTrainers(){
         return this.trainerServices.fetchAllTrainers()
+    }
+
+    @Patch('approve')
+    async approveTrainer(@Body() details: { id: string, approve: boolean }) {
+        return this.trainerServices.approveTrainer(details)
+    }
+
+    @Get('/documents/:filename')
+    async serveFile(@Param('filename') filename: string, @Res() res: Response) {
+        const filePath = join(process.cwd(), 'uploads', filename);
+        res.sendFile(filePath);
+    }
+
+    @Patch('access')
+    async updateTrainerAccess(@Body() details: { id: string, access: boolean }) {
+        return this.trainerServices.updateTrainerAccess(details)
     }
 
 }

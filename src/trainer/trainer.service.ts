@@ -5,12 +5,15 @@ import { TrainerModel } from "./schema/trainer.schema";
 import { JwtService } from "@nestjs/jwt";
 import { Files, Profile, Register, Trainer, fetchTrainers } from "./trainer.interface";
 import * as argon from "argon2";
+import * as fs from 'fs';
+import * as handlebars from 'handlebars';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class TrainerService {
   constructor(
     @InjectModel("Trainer") private trainerModel: Model<TrainerModel>,
-    private jwtService: JwtService
+    private jwtService: JwtService, private readonly mailService: MailerService,
   ) { }
 
   async verifyTrainer(
@@ -145,7 +148,7 @@ export class TrainerService {
 
   async fetchAllTrainers(): Promise<fetchTrainers[]> {
     try {
-      const data = await this.trainerModel.find({}, { cv: 0, certificate: 0, __v: 0, password:0 })
+      const data = await this.trainerModel.find({})
       if (!data) {
         throw new Error("could't find trainers");
       }
@@ -153,6 +156,57 @@ export class TrainerService {
     } catch (error) {
       console.log(error);
       throw new Error(error)
+    }
+  }
+
+  async approveTrainer(details: { id: string, approve: boolean }): Promise<{ success: boolean }> {
+    try {
+      const data = await this.trainerModel.findOneAndUpdate({ _id: details.id }, {
+        $set: {
+          approve: true,
+          access: true,
+          joinDate: Date.now()
+        }
+      })
+      if (data) {
+        let template: HandlebarsTemplateDelegate<{ name: string }>;
+        const templatePath = 'src/helpers/mail-templates/approve-template.hbs';
+        const templateContent = fs.readFileSync(templatePath, 'utf8');
+        template = handlebars.compile(templateContent);
+
+        const htmlContent = template({ name: data.name });
+        this.mailService.sendMail({
+          to: <string>data.email,
+          from: 'ffitgo@gmail.com',
+          subject: 'otp for authentication',
+          text: 'Hello Welcome!',
+          html: htmlContent
+        })
+        return { success: true }
+      } else {
+        return { success: false }
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error)
+    }
+  }
+
+  async updateTrainerAccess(details: { id: string, access: boolean }): Promise<{ success: boolean }> {
+    try {
+      const data = await this.trainerModel.findOneAndUpdate({ _id: details.id }, {
+        $set: {
+          access: details.access
+        }
+      })
+      if (data) {
+        return { success: true }
+      } else {
+        return { success: false }
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
     }
   }
 }

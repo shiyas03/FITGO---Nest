@@ -5,7 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BlogSchema } from './schema/blog.schema';
 import { MulterModule } from '@nestjs/platform-express';
 import { multerMutipleConfig } from '../helpers/multer/multer.config';
-import { UsersSchema } from '../users/schema/users.schema';
 
 @Module({
   imports: [

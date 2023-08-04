@@ -9,6 +9,7 @@ export interface Users{
     name: string;
     email: string;
     access:boolean;
+    imageUrl:string;
 }
 
 export interface Trainers{

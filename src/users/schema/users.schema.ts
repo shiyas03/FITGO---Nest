@@ -55,15 +55,6 @@ export class Users {
   @Prop()
   imageUrl: string;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: "Trainer" })
-  payment: Array<{
-    amount: number;
-    paidDate: Date;
-    paymentId: string;
-    secretKey: string;
-    trainerId: Trainer;
-  }>;
-
   @Prop()
   feedback: string;
 
