@@ -6,7 +6,7 @@ import { Blogs } from "./blog.interface";
 
 @Injectable()
 export class BlogsService {
-  constructor(@InjectModel("Blogs") private blogModel: Model<BlogModel>) {}
+  constructor(@InjectModel("Blogs") private blogModel: Model<BlogModel>) { }
 
   async uploadBlog(
     data: { details: string[] },
@@ -28,6 +28,37 @@ export class BlogsService {
       });
       await newBlog.save();
       return { success: true };
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async updateBlog(
+    data: { details: string[] },
+    details: Express.Multer.File,
+    id: string
+  ): Promise<boolean> {
+    try {
+      const objectId = new mongoose.Types.ObjectId(id);
+      const update = await this.blogModel.findOneAndUpdate({ _id: objectId }, {
+        $set: {
+          title: data.details[0],
+          category: data.details[1],
+          blog: data.details[2],
+        }
+      })
+      if (details) {
+        await this.blogModel.findOneAndUpdate({ _id: objectId }, {
+          $set: {
+            template: details.filename
+          }
+        })
+      }
+      if (update) {
+        return true 
+      }
+      return false
     } catch (error) {
       console.log(error);
       throw new Error(error);

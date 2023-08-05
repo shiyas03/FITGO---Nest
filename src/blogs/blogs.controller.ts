@@ -4,6 +4,7 @@ import {
   Get,
   Patch,
   Post,
+  Put,
   Query,
   UploadedFile,
   UseInterceptors,
@@ -16,7 +17,7 @@ import { cropImage } from "../helpers/multer/multer.config";
 export class BlogsController {
   constructor(private blogServices: BlogsService) { }
 
-  @Post("blog-upload")
+  @Post("upload")
   @UseInterceptors(FileInterceptor("details"))
   async uploadBlog(
     @Query() id: string,
@@ -36,4 +37,17 @@ export class BlogsController {
   async publishBlogs(@Body() data: { action: boolean }, @Query() id: string) {
     return this.blogServices.publishChanges(data.action, id);
   }
-}
+
+  @Put("update")
+  @UseInterceptors(FileInterceptor("details"))
+  async updateBlog(
+    @Query('id') id: any,
+    @UploadedFile() details: Express.Multer.File,
+    @Body() data: { details: string[] }
+  ) {
+    if(details){
+      cropImage(details, [800, 400])
+    }
+    return this.blogServices.updateBlog(data, details, id)
+  }
+} 

@@ -12,7 +12,10 @@ export class Payment {
     amount: number;
 
     @Prop()
-    date: Date;
+    paidDate: Date;
+
+    @Prop()
+    expiryDate: Date;
 
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: "Users" })
     userId: Users;
@@ -21,10 +24,10 @@ export class Payment {
     trainerId: Trainer;
 
     @Prop()
-    months:string[];
+    specialized:string;
 
     @Prop()
-    category:string;
+    secretKey:string;
 }
 
 export const paymentSchema = SchemaFactory.createForClass(Payment);
