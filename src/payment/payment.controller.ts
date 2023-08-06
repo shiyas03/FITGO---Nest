@@ -9,6 +9,6 @@ export class PaymentController {
 
     @Post('')
     async uploadPayment(@Body() details:PaymentData){
-        console.log(details);
+     return this.paymentService.updatePayment(details)
     }
 }

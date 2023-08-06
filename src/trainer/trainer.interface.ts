@@ -38,4 +38,5 @@ export interface fetchTrainers {
   about: string;
   imageUrl: string;
   joinDate: Date;
+  access:boolean
 }

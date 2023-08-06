@@ -23,7 +23,7 @@ export class PaymentService {
           await newPayment.save()
           return true
         } catch (error) {
-          console.log();
+          console.log(error);
           throw new Error(error);
         }
       }
