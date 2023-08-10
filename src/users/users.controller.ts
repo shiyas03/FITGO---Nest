@@ -17,7 +17,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("")
 export class UsersController {
-  constructor(private userService: UsersService) {}
+  constructor(private userService: UsersService) { }
 
   @Post("register")
   async registerUser(@Body() user: Users) {
@@ -25,8 +25,8 @@ export class UsersController {
   }
 
   @Post("mail")
-  async sendMail(@Body() id: string) {
-    return this.userService.sendMail(id);
+  async sendMail(@Body() data: { email: string }) {
+    return this.userService.sendMail(data.email);
   }
 
   @Get("user")
@@ -34,9 +34,9 @@ export class UsersController {
     return this.userService.fetchUser(id);
   }
 
-  @Post("verify-otp")
-  async verifyOtp(@Body() details: { id: string; access: boolean }) {
-    return this.userService.verifyOTP(details);
+  @Post("verify")
+  async verifyOtp(@Body() user: Users) {
+    return this.userService.verify(user);
   }
 
   @Post("user-details")

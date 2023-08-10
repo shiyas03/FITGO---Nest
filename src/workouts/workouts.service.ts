@@ -9,7 +9,7 @@ export class WorkoutsService {
 
     constructor(@InjectModel("Workouts") private workoutModel: Model<WorkoutModel>) { }
 
-    async uploadWorkout(details: string[], files: Express.Multer.File[], id: string): Promise<boolean> {
+    async uploadWorkout(details: string[], file: Express.Multer.File, id: string): Promise<boolean> {
         try {
             const objectId = new mongoose.Types.ObjectId(id);
             const newWorkout = new this.workoutModel({
@@ -21,8 +21,8 @@ export class WorkoutsService {
                 interval: details[5],
                 duration: details[6],
                 overview: details[7],
-                video: files[0].filename,
-                thumbnail: files[1].filename,
+                video: details[8],
+                thumbnail: file.filename,
                 trainerId: objectId,
                 uploadDate: Date.now()
             })

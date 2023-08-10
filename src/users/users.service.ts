@@ -16,8 +16,6 @@ import {
   UserDetails,
   Profile,
   UpdateDetails,
-  PaymentData,
-  Payment,
 } from "./user.interface";
 
 @Injectable()
@@ -30,44 +28,17 @@ export class UsersService {
 
   async registerUser(user: Users): Promise<RegisterReturn> {
     try {
-      const { name, email, phone, password } = user;
+      const { email, phone } = user;
       const usedEmail = await this.userModel.findOne({
         email: { $regex: new RegExp("^" + email + "$", "i") },
       });
       const usedPhone = await this.userModel.findOne({ phone: phone });
       if (usedEmail) {
-        if (usedEmail.access == true) {
-          return { success: false, message: "Email already used" };
-        } else {
-          if (usedPhone && usedPhone.email !== email) {
-            return { success: false, message: "Phone number already used" };
-          } else {
-            const hashPassowrd = await argon.hash(password);
-            const data = await this.userModel.findOneAndUpdate(
-              { email: email },
-              {
-                $set: {
-                  name: name,
-                  phone: phone,
-                  password: hashPassowrd,
-                },
-              }
-            );
-            return { success: true, id: data._id };
-          }
-        }
-      } else if (usedPhone && usedPhone.email !== email) {
+        return { success: false, message: "Email already used" };
+      } else if (usedPhone) {
         return { success: false, message: "Phone number already used" };
       } else {
-        const hashPassowrd = await argon.hash(password);
-        const newUser = new this.userModel({
-          name: name,
-          email: email,
-          phone: phone,
-          password: hashPassowrd,
-        });
-        await newUser.save();
-        return { success: true, id: newUser._id };
+        return { success: true };
       }
     } catch (error) {
       console.log(error);
@@ -75,18 +46,12 @@ export class UsersService {
     }
   }
 
-  async sendMail(id: string): Promise<{ success: boolean; otp: string }> {
+  async sendMail(email: string): Promise<{ success: boolean; otp: string }> {
     try {
       let template: HandlebarsTemplateDelegate<{ otp: string }>;
       const templatePath = "src/helpers/mail-templates/otp-template.hbs";
       const templateContent = fs.readFileSync(templatePath, "utf8");
       template = handlebars.compile(templateContent);
-
-      const objectId = new mongoose.Types.ObjectId(id);
-      const data = await this.userModel.findOne(
-        { _id: objectId },
-        { email: 1 }
-      );
 
       const chars = "0123456789";
       let otp: string = "";
@@ -95,10 +60,9 @@ export class UsersService {
         const randomIndex = Math.floor(Math.random() * chars.length);
         otp += chars[randomIndex];
       }
-
       const htmlContent = template({ otp: otp });
       await this.mailService.sendMail({
-        to: <string>data.email,
+        to: email,
         from: "ffitgo@gmail.com",
         subject: "otp for authentication",
         text: "Hello Welcome!",
@@ -110,25 +74,29 @@ export class UsersService {
       throw Error("Failed to send email");
     }
   }
- 
-  async verifyOTP(details: { id: string; access: boolean }) {
+
+  async verify(user: Users): Promise<{ success: boolean, token: string }> {
     try {
-      if (details.access === true && details.id) {
-        await this.userModel.findOneAndUpdate(
-          { _id: details.id },
-          {
-            $set: {
-              access: true,
-            },
-          }
-        );
-        return { success: true };
+      const hashPassowrd = await argon.hash(user.password);
+      const newUser = new this.userModel({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        password: hashPassowrd,
+        access: true
+      });
+      const save = await newUser.save();
+      if (save) {
+        const paylaod = { _id: newUser._id, email: newUser.email };
+        const token = await this.jwtService.signAsync(paylaod);
+        return { success: true, token: token }
+      } else {
+        throw new Error("Couldn't verify OTP");
       }
-      throw new Error("Couldn't verify OTP");
     } catch (error) {
       console.log(error);
       throw new Error(error);
-    } 
+    }
   }
 
   async fetchUser(id: string): Promise<UserData> {
@@ -137,7 +105,7 @@ export class UsersService {
       const userData = <UserData>(
         await this.userModel.findOne(
           { _id: objectId },
-          { name: 1, email: 1, access: 1,imageUrl:1 }
+          { name: 1, email: 1, access: 1, imageUrl: 1 }
         )
       );
       if (userData) {
@@ -150,13 +118,12 @@ export class UsersService {
     }
   }
 
-  async userDetails(
-    details: UserDetails
-  ): Promise<{ success: boolean; token: string }> {
+  async userDetails( details: UserDetails ): Promise<boolean> {
     try {
       const id = details.id;
+      const objectId = new mongoose.Types.ObjectId(id);
       const data = await this.userModel.findOneAndUpdate(
-        { _id: id },
+        { _id: objectId },
         {
           $set: {
             age: details.age,
@@ -174,9 +141,7 @@ export class UsersService {
         }
       );
       if (data) {
-        const paylaod = { sub: data._id, email: data.email };
-        const token = await this.jwtService.signAsync(paylaod);
-        return { success: true, token: token };
+        return true
       } else {
         throw new Error("couldn't find data");
       }
@@ -193,14 +158,14 @@ export class UsersService {
       });
       if (data) {
         if (data.access == true) {
-          const paylaod = { id: data._id, email: data.email };
+          const paylaod = { _id: data._id, email: data.email };
           const token = await this.jwtService.signAsync(paylaod);
           const verifyPass = await argon.verify(
             data.password,
             details.password
           );
           return verifyPass
-            ? { token: token, id: data._id }
+            ? { token: token }
             : { message: "Incorrect password" };
         } else {
           return { message: "Access denied" };

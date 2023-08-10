@@ -11,7 +11,7 @@ export interface UserDetails {
     activity: string;
     calorieBurn: number;
     calorieNeed: number;
-    id: ObjectId;
+    id: string;
 }
 
 export interface Register {
@@ -27,7 +27,6 @@ export interface Login {
 }
 
 export interface RegisterReturn {
-    id?: ObjectId,
     success: boolean
     message?:string;
 }
@@ -35,7 +34,6 @@ export interface RegisterReturn {
 export interface LoginReturn {
     error?:string
     token?: string,
-    id?:string,
     message?:string
 }
 

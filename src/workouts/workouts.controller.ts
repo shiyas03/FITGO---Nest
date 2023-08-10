@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Patch, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Put, Query, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { WorkoutsService } from './workouts.service';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { cropImage } from '../helpers/multer/multer.config';
 
 @Controller('workouts')
@@ -9,9 +9,9 @@ export class WorkoutsController {
     constructor(private workoutService: WorkoutsService) { }
 
     @Post('upload')
-    @UseInterceptors(FilesInterceptor("files", 2))
+    @UseInterceptors(FileInterceptor("files"))
     async uploadWorkout(@Body() data: { files: string[] },
-        @UploadedFiles() file: Express.Multer.File[],
+        @UploadedFile() file: Express.Multer.File,
         @Query('id') id: string) {
         return this.workoutService.uploadWorkout(data.files, file, id)
     }
