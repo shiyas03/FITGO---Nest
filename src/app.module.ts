@@ -11,6 +11,7 @@ import { JwtMiddleware } from "./helpers/middleware/jwt.middleware";
 import { JwtModule } from "@nestjs/jwt";
 import { WorkoutsModule } from './workouts/workouts.module';
 import { PaymentModule } from './payment/payment.module';
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PaymentModule } from './payment/payment.module';
     BlogsModule,
     AdminModule,
     WorkoutsModule,
+    PaymentModule,
     MongooseModule.forRoot("mongodb://localhost:27017/fitness"),
     MailerModule.forRoot({
       transport: {
@@ -34,24 +36,26 @@ import { PaymentModule } from './payment/payment.module';
       secret: "jwtSecretKey",
       signOptions: { expiresIn: "7d" },
     }),
-    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware)
-      .exclude(
-        { path: '/login', method: RequestMethod.POST },
-        { path: '/register', method: RequestMethod.POST },
-        { path: '/mail', method: RequestMethod.POST },
-        { path: '/verify-otp', method: RequestMethod.POST },
-        { path: '/user-details', method: RequestMethod.POST },
-        { path: '/admin/login', method: RequestMethod.POST },
-        { path: '/trainer/login', method: RequestMethod.POST },
-        { path: '/trainer/register', method: RequestMethod.POST },
-        { path: '/trainer/details', method: RequestMethod.POST })
-      .forRoutes('*')
-  }
-} 
+
+export class AppModule{}
+//  implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(JwtMiddleware)
+//       .exclude(
+//         { path: '/login', method: RequestMethod.POST },
+//         { path: '/register', method: RequestMethod.POST },
+//         { path: '/mail', method: RequestMethod.POST },
+//         { path: '/verify-otp', method: RequestMethod.POST },
+//         { path: '/user-details', method: RequestMethod.POST },
+//         { path: '/admin/login', method: RequestMethod.POST },
+//         { path: '/trainer/login', method: RequestMethod.POST },
+//         { path: '/trainer/register', method: RequestMethod.POST },
+//         { path: '/trainer/details', method: RequestMethod.POST },
+//         { path: '/payment', method: RequestMethod.GET })
+//       .forRoutes('*')
+//   }
+// } 

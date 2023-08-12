@@ -1,14 +1,22 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { PaymentData } from './payment.interface'
+import { Payment } from './payment.interface';
 
 @Controller('payment')
 export class PaymentController {
 
-    constructor(private paymentService : PaymentService){}
+    constructor(private paymentService: PaymentService) { }
 
     @Post('')
-    async uploadPayment(@Body() details:PaymentData){
-     return this.paymentService.updatePayment(details)
+    async payment(@Body() data: Payment) {
+        return await this.paymentService.payment(data)
     }
+
+    @Get('status/:session_id')
+    async paymentStatus(@Param('session_id') session_id: string) {
+        return this.paymentService.paymentStatus(session_id)
+    }
+
+
 }
+

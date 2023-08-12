@@ -30,8 +30,9 @@ interface StripeToken {
     amount: number;
     paidDate: Date;
     expiryDate: Date;
-    secretKey: string;
+    paymentId: string;
     trainerId: string;
     userId:string;
-    category: string;
+    packageId:string;
+    sessionId:string;
   }

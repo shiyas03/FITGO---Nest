@@ -3,28 +3,78 @@ import { InjectModel } from '@nestjs/mongoose';
 import { paymentModel } from './schema/schema';
 import mongoose, { Model } from 'mongoose';
 import { Payment, PaymentData } from './payment.interface';
+import Stripe from 'stripe';
 
 @Injectable()
 export class PaymentService {
 
-    constructor(@InjectModel("Payments") private paymentModel:Model<paymentModel>){}
+  private readonly stripe
+  constructor(@InjectModel("Payments") private paymentModel: Model<paymentModel>) {
+    this.stripe = new Stripe("sk_test_51NaG9bSJ8tM5mOcsqEmQol0W0hRvzVcV3OaPiAkTfb2u2TPSZp83l4hx3SgOAVplhxWck3DQLf5dbw0LDccKG6mS00EtQwsUrE", {
+      apiVersion: '2022-11-15',
+      appInfo: {
+        name: "fitgo-fitness",
+        version: "0.0.1",
+      }
+    })
+  }
 
-    async updatePayment(details: PaymentData): Promise<boolean> {
-        try {
-          const newPayment = new this.paymentModel ({
-            amount: details.stripeToken.amount,
-            paidDate: new Date(),
-            expiryDate: new Date(),
-            secretKey: details.stripeToken.id,
-            trainerId: details.trainerId,
-            userId: details.userId,
-            specialized: details.stripeToken.specialized
-          })
+  async payment(data: Payment): Promise<{ id: string, url: string }> {
+    try {
+      const session = await this.stripe.checkout.sessions.create({
+        mode: "subscription",
+        line_items: [
+          {
+            price: data.packageId,
+            quantity: 1
+          },
+        ],
+        metadata: {
+          amount: data.amount,
+          userId: data.userId,
+          trainerId: data.trainerId,
+          packageId: data.packageId
+        },
+        success_url: `${'http://localhost:4200'}/trainers/view?session_id={CHECKOUT_SESSION_ID}&trainer_id=${data.trainerId}`,
+        cancel_url: `${'http://localhost:4200'}/trainers/view?&trainer_id=${data.trainerId}`,
+        // automatic_tax: { enabled: true }
+      });
+      return session
+    } catch (error) {
+      console.log(error);
+      throw new Error(error)
+    }
+  }
+
+  async paymentStatus(session_id: string): Promise<boolean> {
+    try {
+      if (session_id) {
+        const checkoutSession = await this.stripe.checkout.sessions.retrieve(session_id)
+        const { amount, userId, trainerId, packageId } = checkoutSession.metadata;
+        const period = <number>amount < 600 ? 30 : amount > 7000 ? 360 : 180
+        const currentDate = new Date()
+        const newDate = currentDate.setDate(currentDate.getDate() + period)
+        const newPayment = new this.paymentModel({
+          amount: amount,
+          userId: userId,
+          trainerId: trainerId,
+          packageId: packageId,
+          paidDate: new Date,
+          expiryDate: newDate,
+          sessionId: session_id
+        })
+        if (checkoutSession.status === 'complete') {
           await newPayment.save()
           return true
-        } catch (error) {
-          console.log(error);
-          throw new Error(error);
+        } else {
+          return false
         }
       }
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error)
+    }
+  }
+
+
 }

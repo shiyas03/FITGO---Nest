@@ -24,10 +24,10 @@ export class Payment {
     trainerId: Trainer;
 
     @Prop()
-    specialized:string;
+    packageId:string;
 
     @Prop()
-    secretKey:string;
+    sessionId:string;
 }
 
 export const paymentSchema = SchemaFactory.createForClass(Payment);
