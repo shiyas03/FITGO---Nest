@@ -33,6 +33,9 @@ export class Trainer {
     certificate: string[]
 
     @Prop()
+    services: string[]
+
+    @Prop()
     imageUrl: string
 
     @Prop({ type: Boolean, default: false })

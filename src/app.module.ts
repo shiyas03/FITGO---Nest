@@ -41,21 +41,19 @@ import { ConfigModule } from "@nestjs/config";
   providers: [AppService],
 })
 
-export class AppModule{}
-//  implements NestModule {
-//   configure(consumer: MiddlewareConsumer) {
-//     consumer.apply(JwtMiddleware)
-//       .exclude(
-//         { path: '/login', method: RequestMethod.POST },
-//         { path: '/register', method: RequestMethod.POST },
-//         { path: '/mail', method: RequestMethod.POST },
-//         { path: '/verify-otp', method: RequestMethod.POST },
-//         { path: '/user-details', method: RequestMethod.POST },
-//         { path: '/admin/login', method: RequestMethod.POST },
-//         { path: '/trainer/login', method: RequestMethod.POST },
-//         { path: '/trainer/register', method: RequestMethod.POST },
-//         { path: '/trainer/details', method: RequestMethod.POST },
-//         { path: '/payment', method: RequestMethod.GET })
-//       .forRoutes('*')
-//   }
-// } 
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleware)
+      .exclude(
+        { path: '/login', method: RequestMethod.POST },
+        { path: '/register', method: RequestMethod.POST },
+        { path: '/mail', method: RequestMethod.POST },
+        { path: '/verify-otp', method: RequestMethod.POST },
+        { path: '/user-details', method: RequestMethod.POST },
+        { path: '/admin/login', method: RequestMethod.POST },
+        { path: '/trainer/login', method: RequestMethod.POST },
+        { path: '/trainer/register', method: RequestMethod.POST },
+        { path: '/trainer/details', method: RequestMethod.POST })
+      .forRoutes('*')
+  }
+} 

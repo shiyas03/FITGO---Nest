@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { paymentModel } from './schema/schema';
 import mongoose, { Model } from 'mongoose';
-import { Payment, PaymentData } from './payment.interface';
+import { Payment, PaymentData, PaymentDetails } from './payment.interface';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -76,5 +76,22 @@ export class PaymentService {
     }
   }
 
+  async fetchPayments(userId: string): Promise<PaymentDetails[]> {
+    try {
+      if (userId) {
+        const objectId = new mongoose.Types.ObjectId(userId)
+        const data = <PaymentDetails[]>(await this.paymentModel.find({ userId: objectId }).populate('userId').populate('trainerId'))
+        if (data) {
+          const sortedData = data.sort((a, b) => b.expiryDate.getTime() - a.expiryDate.getTime());
+          return sortedData
+        } else {
+          throw new Error("Couldn't find payments")
+        }
+      }
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error)
+    }
+  }
 
 }

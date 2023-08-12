@@ -209,4 +209,28 @@ export class TrainerService {
       throw new Error(error);
     }
   }
+
+  async updateService(data: string, id: string): Promise<boolean> {
+    try {
+      await this.trainerModel.updateOne({ _id: id }, {
+        $push: { services: data }
+      }, { new: true })
+      return true
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error)
+    }
+  }
+
+  async removeService(data: string, id: string): Promise<boolean> {
+    try {
+      await this.trainerModel.updateOne({ _id: id }, {
+        $pull: { services: data }
+      }, { new: true })
+      return true
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error)
+    }
+  }
 }

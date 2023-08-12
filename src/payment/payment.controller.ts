@@ -17,6 +17,9 @@ export class PaymentController {
         return this.paymentService.paymentStatus(session_id)
     }
 
-
+    @Get('fetch/:user_id')
+    async fetchPayments(@Param('user_id') user_id: string) {
+        return this.paymentService.fetchPayments(user_id)
+    }
 }
 

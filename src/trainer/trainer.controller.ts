@@ -30,7 +30,7 @@ export class TrainerController {
         let certificates = []
         for (let i = 1; i < files.length; i++) {
             certificates.push(files[i])
-        }  
+        }
         return this.trainerServices.detailsUpload(details, cv, certificates, id)
     }
 
@@ -55,7 +55,7 @@ export class TrainerController {
     }
 
     @Get('fetchAll')
-    async fetchAllTrainers(){
+    async fetchAllTrainers() {
         return this.trainerServices.fetchAllTrainers()
     }
 
@@ -73,6 +73,16 @@ export class TrainerController {
     @Patch('access')
     async updateTrainerAccess(@Body() details: { id: string, access: boolean }) {
         return this.trainerServices.updateTrainerAccess(details)
+    }
+
+    @Patch('service')
+    async updateServices(@Body() details: { data: string },@Query('id') id:any) {
+        return this.trainerServices.updateService(details.data,id)
+    }
+
+    @Patch('service_remove')
+    async removeServices(@Body() details: { data: string },@Query('id') id:any) {
+        return this.trainerServices.removeService(details.data,id)
     }
 
 }
