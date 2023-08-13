@@ -1,6 +1,19 @@
-import { Body, Controller, Post, UseInterceptors, UploadedFiles, Param, Get, Patch, Query, UploadedFile, Res } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Post,
+    UseInterceptors,
+    UploadedFiles,
+    Param,
+    Get,
+    Patch,
+    Query,
+    UploadedFile,
+    Res,
+    Put
+} from '@nestjs/common';
 import { TrainerService } from './trainer.service';
-import { Register, Trainer } from './trainer.interface';
+import { Register, Trainer, Update } from './trainer.interface';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { cropImage } from '../helpers/multer/multer.config';
 import { Response } from 'express';
@@ -13,12 +26,12 @@ export class TrainerController {
 
     @Post('login')
     async trainerLogin(@Body() trainerData: Trainer) {
-        return this.trainerServices.verifyTrainer(trainerData)
+        return await this.trainerServices.verifyTrainer(trainerData)
     }
 
     @Post('register')
     async register(@Body() trainerData: Register) {
-        return this.trainerServices.register(trainerData)
+        return await this.trainerServices.register(trainerData)
     }
 
     @Post('details')
@@ -31,17 +44,17 @@ export class TrainerController {
         for (let i = 1; i < files.length; i++) {
             certificates.push(files[i])
         }
-        return this.trainerServices.detailsUpload(details, cv, certificates, id)
+        return await this.trainerServices.detailsUpload(details, cv, certificates, id)
     }
 
     @Get('access/:id')
     async getAccess(@Param('id') id: string) {
-        return this.trainerServices.getAccess(id)
+        return await this.trainerServices.getAccess(id)
     }
 
     @Get('fetch/:id')
     async fetchTrainers(@Param('id') id: string) {
-        return this.trainerServices.fetchProfileDetails(id)
+        return await this.trainerServices.fetchProfileDetails(id)
     }
 
     @Patch("image")
@@ -51,17 +64,17 @@ export class TrainerController {
         @UploadedFile() profile: Express.Multer.File
     ) {
         cropImage(profile, [400, 500])
-        return this.trainerServices.uploadProfile(profile, id);
+        return await this.trainerServices.uploadProfile(profile, id);
     }
 
     @Get('fetchAll')
     async fetchAllTrainers() {
-        return this.trainerServices.fetchAllTrainers()
+        return await this.trainerServices.fetchAllTrainers()
     }
 
     @Patch('approve')
     async approveTrainer(@Body() details: { id: string, approve: boolean }) {
-        return this.trainerServices.approveTrainer(details)
+        return await this.trainerServices.approveTrainer(details)
     }
 
     @Get('/documents/:filename')
@@ -72,17 +85,22 @@ export class TrainerController {
 
     @Patch('access')
     async updateTrainerAccess(@Body() details: { id: string, access: boolean }) {
-        return this.trainerServices.updateTrainerAccess(details)
+        return await this.trainerServices.updateTrainerAccess(details)
     }
 
     @Patch('service')
-    async updateServices(@Body() details: { data: string },@Query('id') id:any) {
-        return this.trainerServices.updateService(details.data,id)
+    async updateServices(@Body() details: { data: string }, @Query('id') id: any) {
+        return await this.trainerServices.updateService(details.data, id)
     }
 
     @Patch('service_remove')
-    async removeServices(@Body() details: { data: string },@Query('id') id:any) {
-        return this.trainerServices.removeService(details.data,id)
+    async removeServices(@Body() details: { data: string }, @Query('id') id: any) {
+        return await this.trainerServices.removeService(details.data, id)
+    }
+
+    @Put('update')
+    async updateProfile(@Body() data: Update, @Query('id') id: string) {
+        return await this.trainerServices.updateProfile(data, id)
     }
 
 }

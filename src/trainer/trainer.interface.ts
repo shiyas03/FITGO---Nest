@@ -40,3 +40,9 @@ export interface fetchTrainers {
   joinDate: Date;
   access:boolean
 }
+
+export interface Update{
+  name:string
+  phone:string
+  about:string
+}

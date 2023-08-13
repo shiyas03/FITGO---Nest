@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { TrainerModel } from "./schema/trainer.schema";
 import { JwtService } from "@nestjs/jwt";
-import { Files, Profile, Register, Trainer, fetchTrainers } from "./trainer.interface";
+import { Files, Profile, Register, Trainer, Update, fetchTrainers } from "./trainer.interface";
 import * as argon from "argon2";
 import * as fs from 'fs';
 import * as handlebars from 'handlebars';
@@ -227,6 +227,22 @@ export class TrainerService {
       await this.trainerModel.updateOne({ _id: id }, {
         $pull: { services: data }
       }, { new: true })
+      return true
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error)
+    }
+  }
+
+  async updateProfile(data: Update, id: string): Promise<boolean> {
+    try {
+      await this.trainerModel.updateOne({ _id: id }, {
+        $set: {
+          name: data.name,
+          phone: data.phone,
+          about: data.about
+        }
+      })
       return true
     } catch (error) {
       console.log(error.message);
