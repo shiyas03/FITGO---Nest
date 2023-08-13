@@ -18,6 +18,7 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { cropImage } from '../helpers/multer/multer.config';
 import { Response } from 'express';
 import { join } from 'path';
+import { ObjectId } from 'mongoose';
 
 @Controller('trainer')
 export class TrainerController {
@@ -101,6 +102,11 @@ export class TrainerController {
     @Put('update')
     async updateProfile(@Body() data: Update, @Query('id') id: string) {
         return await this.trainerServices.updateProfile(data, id)
+    }
+
+    @Patch('review')
+    async uploadReview(@Body() data: { review: string, userId: string }, @Query('id') id: string) {
+        return this.trainerServices.uploadReview(data, id)
     }
 
 }

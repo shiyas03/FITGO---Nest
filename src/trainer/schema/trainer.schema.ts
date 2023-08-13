@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Document, Schema as MongooseSchema } from "mongoose";
+import { ReviewInfo, ReviewInfoSchema } from "./review.schema";
 
 export type TrainerModel = Document & Trainer
+
 
 @Schema({ collection: 'trainers' })
 export class Trainer {
@@ -48,7 +50,10 @@ export class Trainer {
     access: boolean
 
     @Prop()
-    joinDate: Date
+    joinDate: Date;
+
+    @Prop({ type: [ReviewInfoSchema] })
+    reviews: ReviewInfo[];
 }
 
 export const TrainerSchema = SchemaFactory.createForClass(Trainer);

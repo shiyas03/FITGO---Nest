@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Schema as MongooseSchema } from "mongoose";
+import mongoose, { Document, Schema as MongooseSchema } from "mongoose";
 import { Trainer } from "../../trainer/schema/trainer.schema";
 
 export type userDocument = Users & Document;
 
 @Schema({ collection: "users" })
-export class Users {
+export class Users extends mongoose.Document {
 
   @Prop()
   name: string;

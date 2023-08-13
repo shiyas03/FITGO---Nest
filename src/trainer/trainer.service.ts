@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model, ObjectId } from "mongoose";
 import { TrainerModel } from "./schema/trainer.schema";
 import { JwtService } from "@nestjs/jwt";
 import { Files, Profile, Register, Trainer, Update, fetchTrainers } from "./trainer.interface";
@@ -148,7 +148,7 @@ export class TrainerService {
 
   async fetchAllTrainers(): Promise<fetchTrainers[]> {
     try {
-      const data = await this.trainerModel.find({})
+      const data = <fetchTrainers[]>await this.trainerModel.find().populate('reviews.userId')
       if (!data) {
         throw new Error("could't find trainers");
       }
@@ -244,6 +244,24 @@ export class TrainerService {
         }
       })
       return true
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error)
+    }
+  }
+
+  async uploadReview(data: { review: string, userId: string }, id: string): Promise<boolean> {
+    try {
+      const complete = await this.trainerModel.updateOne({ _id: id }, {
+        $push: {
+          reviews: data
+        }
+      }, { new: true })
+      if (complete.modifiedCount == 1) {
+        return true
+      } else {
+        return false
+      }
     } catch (error) {
       console.log(error.message);
       throw new Error(error)

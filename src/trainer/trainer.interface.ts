@@ -39,6 +39,14 @@ export interface fetchTrainers {
   imageUrl: string;
   joinDate: Date;
   access:boolean
+  reviews:[{
+    review:string;
+    userId:{
+      _id:string;
+      name:string;
+      imageUrl:string;
+    }
+  }]
 }
 
 export interface Update{
