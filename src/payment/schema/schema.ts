@@ -28,6 +28,9 @@ export class Payment {
 
     @Prop()
     sessionId:string;
+
+    @Prop()
+    status:string;
 }
 
 export const paymentSchema = SchemaFactory.createForClass(Payment);

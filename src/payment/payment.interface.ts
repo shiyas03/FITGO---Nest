@@ -49,4 +49,5 @@ export interface PaymentDetails {
   sessionId: string;
   userId: UserData;
   trainerId: fetchTrainers;
+  status: string;
 }

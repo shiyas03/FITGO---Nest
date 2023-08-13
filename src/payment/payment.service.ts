@@ -61,7 +61,8 @@ export class PaymentService {
           packageId: packageId,
           paidDate: new Date,
           expiryDate: newDate,
-          sessionId: session_id
+          sessionId: session_id,
+          status: checkoutSession.status
         })
         if (checkoutSession.status === 'complete') {
           await newPayment.save()
