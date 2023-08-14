@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { paymentModel } from './schema/schema';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, trusted } from 'mongoose';
 import { Payment, PaymentData, PaymentDetails } from './payment.interface';
 import Stripe from 'stripe';
+import { TrainerModel } from 'src/trainer/schema/trainer.schema';
 
 @Injectable()
 export class PaymentService {
 
   private readonly stripe
-  constructor(@InjectModel("Payments") private paymentModel: Model<paymentModel>) {
+  constructor(@InjectModel("Payments") private paymentModel: Model<paymentModel>, @InjectModel("Trainer") private trainerModel: Model<TrainerModel>,) {
     this.stripe = new Stripe("sk_test_51NaG9bSJ8tM5mOcsqEmQol0W0hRvzVcV3OaPiAkTfb2u2TPSZp83l4hx3SgOAVplhxWck3DQLf5dbw0LDccKG6mS00EtQwsUrE", {
       apiVersion: '2022-11-15',
       appInfo: {
@@ -62,7 +63,8 @@ export class PaymentService {
           paidDate: new Date,
           expiryDate: newDate,
           sessionId: session_id,
-          status: checkoutSession.status
+          user_status: checkoutSession.status,
+          trainer_status: false,
         })
         if (checkoutSession.status === 'complete') {
           await newPayment.save()
@@ -91,6 +93,64 @@ export class PaymentService {
       }
     } catch (error) {
       console.log(error.message);
+      throw new Error(error)
+    }
+  }
+
+  async fetchAllPayments(): Promise<PaymentDetails[]> {
+    try {
+      const data = <PaymentDetails[]>(await this.paymentModel.find().populate('userId').populate('trainerId'))
+      if (data) {
+        const sortedData = data.sort((a, b) => b.expiryDate.getTime() - a.expiryDate.getTime());
+        return sortedData
+      } else {
+        throw new Error("Couldn't find payments")
+      }
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error)
+    }
+  }
+
+  async fetchTrainerPayments(trainerId: string): Promise<PaymentDetails[]> {
+    try {
+      if (trainerId) {
+        const objectId = new mongoose.Types.ObjectId(trainerId)
+        const data = <PaymentDetails[]>(await this.paymentModel.find({ trainerId: objectId }).populate('userId').populate('trainerId'))
+        if (data) {
+          const sortedData = data.sort((a, b) => b.expiryDate.getTime() - a.expiryDate.getTime());
+          return sortedData
+        } else {
+          throw new Error("Couldn't find payments")
+        }
+      }
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error)
+    }
+  }
+
+  async payToTrainer(trainerId: string): Promise<boolean> {
+    try {
+      const data = await this.paymentModel.findOneAndUpdate({ trainerId: trainerId }, {
+        $set: {
+          trainer_status: true
+        }
+      });
+      if (data) {
+        const newAmount = Math.abs(data.amount * 0.7)
+        const details = {
+          date: new Date(),
+          amount: newAmount
+        }
+        await this.trainerModel.updateOne({ _id: trainerId }, {
+          $push: { payments: details }
+        }, { new: true })
+        return true
+      }
+      return false
+    } catch (error) {
+      console.log(error);
       throw new Error(error)
     }
   }

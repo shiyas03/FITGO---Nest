@@ -24,13 +24,16 @@ export class Payment {
     trainerId: Trainer;
 
     @Prop()
-    packageId:string;
+    packageId: string;
 
     @Prop()
-    sessionId:string;
+    sessionId: string;
 
     @Prop()
-    status:string;
+    user_status: string;
+
+    @Prop()
+    trainer_status: boolean;
 }
 
 export const paymentSchema = SchemaFactory.createForClass(Payment);

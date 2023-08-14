@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema } from "mongoose";
 import { ReviewInfo, ReviewInfoSchema } from "./review.schema";
+import { paymentInfo, paymentInfoSchema } from "./payment.schema";
 
 export type TrainerModel = Document & Trainer
 
@@ -54,6 +55,9 @@ export class Trainer {
 
     @Prop({ type: [ReviewInfoSchema] })
     reviews: ReviewInfo[];
+
+    @Prop({ type: [paymentInfoSchema] })
+    payments: paymentInfo[]
 }
 
 export const TrainerSchema = SchemaFactory.createForClass(Trainer);

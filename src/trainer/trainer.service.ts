@@ -127,7 +127,7 @@ export class TrainerService {
   async uploadProfile(profile: Express.Multer.File, id: string) {
     try {
       const objectId = new mongoose.Types.ObjectId(id);
-      const data = await this.trainerModel.findOneAndUpdate(
+      const data = await this.trainerModel.updateOne(
         { _id: objectId },
         {
           $set: {
