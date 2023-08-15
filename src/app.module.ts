@@ -12,6 +12,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { WorkoutsModule } from './workouts/workouts.module';
 import { PaymentModule } from './payment/payment.module';
 import { ConfigModule } from "@nestjs/config";
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ConfigModule } from "@nestjs/config";
       secret: "jwtSecretKey",
       signOptions: { expiresIn: "7d" },
     }),
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
