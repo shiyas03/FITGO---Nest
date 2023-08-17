@@ -78,7 +78,7 @@ export class TrainerController {
         return await this.trainerServices.approveTrainer(details)
     }
 
-    @Get('/documents/:filename')
+    @Get('documents/:filename')
     async serveFile(@Param('filename') filename: string, @Res() res: Response) {
         const filePath = join(process.cwd(), 'uploads', filename);
         res.sendFile(filePath);
@@ -90,12 +90,12 @@ export class TrainerController {
     }
 
     @Patch('service')
-    async updateServices(@Body() details: { data: string }, @Query('id') id: any) {
+    async updateServices(@Body() details: { data: string }, @Query('id') id: string) {
         return await this.trainerServices.updateService(details.data, id)
     }
 
     @Patch('service_remove')
-    async removeServices(@Body() details: { data: string }, @Query('id') id: any) {
+    async removeServices(@Body() details: { data: string }, @Query('id') id: string) {
         return await this.trainerServices.removeService(details.data, id)
     }
 

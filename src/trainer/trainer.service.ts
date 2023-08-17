@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import mongoose, { Model, ObjectId } from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { TrainerModel } from "./schema/trainer.schema";
 import { JwtService } from "@nestjs/jwt";
 import { Files, Profile, Register, Trainer, Update, fetchTrainers } from "./trainer.interface";
@@ -112,7 +112,7 @@ export class TrainerService {
     try {
       const data = await this.trainerModel.findOne(
         { _id: id },
-        { certificate: 0, cv: 0, _id: 0 }
+        { certificate: 0, cv: 0 }
       );
       if (!data) {
         throw new NotFoundException('Details not found');

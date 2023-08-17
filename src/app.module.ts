@@ -22,6 +22,7 @@ import { ChatModule } from './chat/chat.module';
     AdminModule,
     WorkoutsModule,
     PaymentModule,
+    ChatModule,
     MongooseModule.forRoot("mongodb://localhost:27017/fitness"),
     MailerModule.forRoot({
       transport: {
@@ -37,7 +38,6 @@ import { ChatModule } from './chat/chat.module';
       secret: "jwtSecretKey",
       signOptions: { expiresIn: "7d" },
     }),
-    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

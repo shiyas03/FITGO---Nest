@@ -41,7 +41,7 @@ export class BlogsController {
   @Put("update")
   @UseInterceptors(FileInterceptor("details"))
   async updateBlog(
-    @Query('id') id: any,
+    @Query('id') id: string,
     @UploadedFile() details: Express.Multer.File,
     @Body() data: { details: string[] }
   ) {

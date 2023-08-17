@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema } from "mongoose";
 import { Trainer } from "../../trainer/schema/trainer.schema";
-import { Users } from "../../users/schema/users.schema";
 
 export type WorkoutModel = Document & Workout
 
