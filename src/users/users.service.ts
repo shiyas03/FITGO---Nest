@@ -33,11 +33,23 @@ export class UsersService {
         email: { $regex: new RegExp("^" + email + "$", "i") },
       });
       const usedPhone = await this.userModel.findOne({ phone: phone });
-      if (usedEmail) {
+      if (usedEmail && usedEmail.access === true) {
         return { success: false, message: "Email already used" };
-      } else if (usedPhone) {
+      } else if (usedPhone && usedPhone.access === true) {
         return { success: false, message: "Phone number already used" };
       } else {
+        if (usedEmail || usedPhone) {
+          const data = usedEmail || usedPhone
+          await this.userModel.deleteOne({ email: data.email })
+        }
+        const hashPassowrd = await argon.hash(user.password);
+        const newUser = new this.userModel({
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          password: hashPassowrd
+        });
+        await newUser.save();
         return { success: true };
       }
     } catch (error) {
@@ -77,16 +89,8 @@ export class UsersService {
 
   async verify(user: Users): Promise<{ success: boolean, token: string }> {
     try {
-      const hashPassowrd = await argon.hash(user.password);
-      const newUser = new this.userModel({
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        password: hashPassowrd,
-        access: true
-      });
-      const save = await newUser.save();
-      if (save) {
+      const newUser = await this.userModel.findOneAndUpdate({ email: user.email }, { $set: { access: true } })
+      if (newUser) {
         const paylaod = { _id: newUser._id, email: newUser.email };
         const token = await this.jwtService.signAsync(paylaod);
         return { success: true, token: token }
@@ -105,9 +109,7 @@ export class UsersService {
       const userData = <UserData>(
         await this.userModel.findOne(
           { _id: objectId },
-          { name: 1, email: 1, access: 1, imageUrl: 1 }
-        )
-      );
+          { name: 1, email: 1, access: 1, imageUrl: 1 }))
       if (userData) {
         return userData;
       } else {
@@ -118,7 +120,7 @@ export class UsersService {
     }
   }
 
-  async userDetails( details: UserDetails ): Promise<boolean> {
+  async userDetails(details: UserDetails): Promise<boolean> {
     try {
       const id = details.id;
       const objectId = new mongoose.Types.ObjectId(id);
@@ -157,22 +159,23 @@ export class UsersService {
         email: { $regex: new RegExp("^" + details.email + "$", "i") },
       });
       if (data) {
-        if (data.access == true) {
-          const paylaod = { _id: data._id, email: data.email };
-          const token = await this.jwtService.signAsync(paylaod);
-          const verifyPass = await argon.verify(
-            data.password,
-            details.password
-          );
-          return verifyPass
-            ? { token: token }
-            : { message: "Incorrect password" };
-        } else {
+        if (data.isUpload === true && data.access === false) {
           return { message: "Access denied" };
+        } else {
+          if (data.access == true) {
+            const paylaod = { _id: data._id, email: data.email };
+            const token = await this.jwtService.signAsync(paylaod);
+            const verifyPass = await argon.verify(
+              data.password,
+              details.password
+            );
+            return verifyPass
+              ? { token: token }
+              : { message: "Incorrect password" };
+          }
         }
-      } else {
-        return { message: "Email not found" };
       }
+      return { message: "Email not found" };
     } catch (error) {
       console.log(error);
       throw new Error(error);
