@@ -11,6 +11,11 @@ export class ChatController {
         return this.chatService.getAllChats(data)
     }
 
+    @Post('get_all')
+    async getAllConnections(@Body() data:any) {
+       return this.chatService.getAllConnections(data)
+    }
+
     @Get('trainers/:userId')
     async fetchTrainers(@Param('userId') userId: string) {
         return this.chatService.fetchTrainers(userId)

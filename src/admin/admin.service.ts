@@ -33,7 +33,7 @@ export class AdminService {
 
     async fetchUsers(): Promise<Users[]> {
         try {
-            const datas: Users[] = await this.userModel.find({}, { name: 1, email: 1, access: 1, imageUrl : 1 })
+            const datas: Users[] = await this.userModel.find({}, { name: 1, email: 1, access: 1, imageUrl: 1, joinDate: 1 })
             return datas
         } catch (error) {
             console.log(error);
@@ -55,5 +55,5 @@ export class AdminService {
         }
     }
 
-    
+
 } 

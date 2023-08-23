@@ -40,7 +40,7 @@ export class ChatService {
         }
     }
 
-    async fetchUserConnections(id: string) { 
+    async fetchUserConnections(id: string) {
         try {
             const details = await this.connectionModel.find({
                 'connections.user': id,
@@ -140,7 +140,7 @@ export class ChatService {
                     'connections.trainer': data.sender
                 })
                 connectionId = connection._id.toString()
-            }else{
+            } else {
                 connectionId = connection._id.toString()
             }
             const newChat = new this.chatModel({
@@ -170,6 +170,16 @@ export class ChatService {
             return data
         } catch (error) {
             console.log(error.message);
+            throw new Error(error);
+        }
+    }
+
+    async getAllConnections(sample: any[]): Promise<AllChat[]> {
+        try {
+            const data = <AllChat[]>await this.chatModel.find({ connection: { $in: sample } })
+            return data
+        } catch (error) {
+            console.log(error);
             throw new Error(error);
         }
     }
