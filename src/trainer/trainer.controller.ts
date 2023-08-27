@@ -106,7 +106,12 @@ export class TrainerController {
 
     @Patch('review')
     async uploadReview(@Body() data: { review: string, userId: string }, @Query('id') id: string) {
-        return this.trainerServices.uploadReview(data, id)
+        return await this.trainerServices.uploadReview(data, id)
+    }
+
+    @Patch('notification')
+    async chageNotification(@Body() data: { trainerId: string }) {
+        return await this.trainerServices.changeNotification(data.trainerId)
     }
 
 }

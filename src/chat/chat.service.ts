@@ -139,4 +139,17 @@ export class ChatService {
         }
     }
 
+    async updateMessageSeen(connectionId: string): Promise<boolean> {
+        try {
+            const update = await this.chatModel.updateMany({ connection: connectionId }, { $set: { seen: true } })
+            if (update.modifiedCount > 0) {
+                return true
+            }
+            return false
+        } catch (error) {
+            console.log(error.message);
+            throw new Error(error)
+        }
+    }
+
 }

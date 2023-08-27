@@ -41,6 +41,9 @@ export class Trainer {
     @Prop()
     imageUrl: string
 
+    @Prop()
+    notification: number
+
     @Prop({ type: Boolean, default: false })
     isUpload: boolean
 

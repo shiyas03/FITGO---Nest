@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ChatService } from './chat.service';
 
 @Controller('chat')
@@ -12,8 +12,8 @@ export class ChatController {
     }
 
     @Post('get_all')
-    async getAllConnections(@Body() data:string[]) {
-       return await this.chatService.getAllConnections(data)
+    async getAllConnections(@Body() data: string[]) {
+        return await this.chatService.getAllConnections(data)
     }
 
     @Get('trainers/:trainerId')
@@ -25,5 +25,10 @@ export class ChatController {
     async createConnections(@Body() connections: { user: string, trainer: string }) {
         return await this.chatService.createConnection(connections)
     }
-    
+
+    @Patch('seen')
+    async updateMeesageSeen(@Body() data: { connectionId: string }) {
+        return await this.chatService.updateMessageSeen(data.connectionId)
+    }
+
 }
