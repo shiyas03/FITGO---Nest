@@ -101,7 +101,7 @@ export class PaymentService {
     try {
       const data = <PaymentDetails[]>(await this.paymentModel.find().populate('userId').populate('trainerId'))
       if (data) {
-        const sortedData = data.sort((a, b) => b.expiryDate.getTime() - a.expiryDate.getTime());
+        const sortedData = data.sort((a, b) => b.paidDate.getTime() - a.paidDate.getTime());
         return sortedData
       } else {
         throw new Error("Couldn't find payments")
@@ -118,7 +118,7 @@ export class PaymentService {
         const objectId = new mongoose.Types.ObjectId(trainerId)
         const data = <PaymentDetails[]>(await this.paymentModel.find({ trainerId: objectId }).populate('userId').populate('trainerId'))
         if (data) {
-          const sortedData = data.sort((a, b) => b.expiryDate.getTime() - a.expiryDate.getTime());
+          const sortedData = data.sort((a, b) => b.paidDate.getTime() - a.paidDate.getTime());
           return sortedData
         } else {
           throw new Error("Couldn't find payments")
@@ -138,7 +138,7 @@ export class PaymentService {
         }
       });
       if (data) {
-        const newAmount = Math.abs(data.amount * 0.7)
+        const newAmount = Math.abs(data.amount * 0.6)
         const details = {
           date: new Date(),
           amount: newAmount

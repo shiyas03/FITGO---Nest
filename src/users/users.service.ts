@@ -47,7 +47,7 @@ export class UsersService {
           name: user.name,
           email: user.email,
           phone: user.phone,
-          password: hashPassowrd
+          password: hashPassowrd,
         });
         await newUser.save();
         return { success: true };
@@ -139,6 +139,7 @@ export class UsersService {
             caloriesBurn: details.calorieBurn,
             caloriesNeed: details.calorieNeed,
             isUpload: true,
+            imageUrl: ''
           },
         }
       );

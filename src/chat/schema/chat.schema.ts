@@ -21,6 +21,9 @@ export class Chat {
 
     @Prop({ default: Date.now })
     timestamp: Date
+
+    @Prop({})
+    seen: boolean
 }
 
 export const ChatSchema = SchemaFactory.createForClass(Chat)

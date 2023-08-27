@@ -29,4 +29,5 @@ export interface AllChat{
     reciever:string,
     content:string;
     timestamp:string;
+    seen:boolean
 }

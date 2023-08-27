@@ -6,39 +6,24 @@ export class ChatController {
 
     constructor(private chatService: ChatService) { }
 
-    @Post('')
-    async getAllChats(@Body() data: { trainerId: string, userId: string }) {
-        return this.chatService.getAllChats(data)
+    @Get('users/:userId')
+    async fetchConnections(@Param('userId') userId: string) {
+        return await this.chatService.fetchUserConnections(userId)
     }
 
     @Post('get_all')
-    async getAllConnections(@Body() data:any) {
-       return this.chatService.getAllConnections(data)
+    async getAllConnections(@Body() data:string[]) {
+       return await this.chatService.getAllConnections(data)
     }
 
-    @Get('trainers/:userId')
-    async fetchTrainers(@Param('userId') userId: string) {
-        return this.chatService.fetchTrainers(userId)
-    }
-
-    @Get('connections/:userId')
-    async fetchConnections(@Param('userId') userId: string) {
-        return this.chatService.fetchUserConnections(userId)
-    }
-
-    @Get('all/:trainerId')
+    @Get('trainers/:trainerId')
     async fetchTrainerConnections(@Param('trainerId') trainerId: string) {
-        return this.chatService.fetchTrainerConnections(trainerId)
-    }
-
-    @Get('users/:id')
-    async fetchUsers(@Param('id') id: string) {
-        return this.chatService.fetchUsers(id)
+        return await this.chatService.fetchTrainerConnections(trainerId)
     }
 
     @Post('create')
     async createConnections(@Body() connections: { user: string, trainer: string }) {
-        return this.chatService.createConnection(connections)
+        return await this.chatService.createConnection(connections)
     }
     
 }

@@ -12,34 +12,6 @@ export class ChatService {
         @InjectModel("Connection") private connectionModel: Model<ConnectionModel>) { }
 
 
-    async fetchTrainers(id: string): Promise<Messages[]> {
-        try {
-            const data: Messages[] = await this.chatModel.find({ sender: id })
-            if (!data) {
-                throw new Error("Could not find")
-            }
-            const sorted: Messages[] = data.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-            return sorted
-        } catch (error) {
-            console.log(error.message);
-            throw new Error(error)
-        }
-    }
-
-    async fetchUsers(id: string): Promise<Messages[]> {
-        try {
-            const data: Messages[] = await this.chatModel.find({ sender: id })
-            if (!data) {
-                throw new Error("Could not find")
-            }
-            const sorted: Messages[] = data.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-            return sorted
-        } catch (error) {
-            console.log(error.message);
-            throw new Error(error)
-        }
-    }
-
     async fetchUserConnections(id: string) {
         try {
             const details = await this.connectionModel.find({
@@ -147,7 +119,8 @@ export class ChatService {
                 connection: connectionId,
                 sender: data.sender,
                 reciever: data.reciever,
-                content: data.content
+                content: data.content,
+                seen: false
             })
             await newChat.save()
         } catch (error) {
@@ -156,27 +129,9 @@ export class ChatService {
         }
     }
 
-    async getAllChats(details: { trainerId: string, userId: string }): Promise<AllChat[]> {
+    async getAllConnections(details: string[]): Promise<AllChat[]> {
         try {
-            const connection = await this.connectionModel.findOne({
-                'connections.user': details.userId,
-                'connections.trainer': details.trainerId
-            })
-            const connectionId = connection._id.toString()
-            const data = <AllChat[]>await this.chatModel.find({ connection: connectionId })
-            if (!data) {
-                throw Error("no messages")
-            }
-            return data
-        } catch (error) {
-            console.log(error.message);
-            throw new Error(error);
-        }
-    }
-
-    async getAllConnections(sample: any[]): Promise<AllChat[]> {
-        try {
-            const data = <AllChat[]>await this.chatModel.find({ connection: { $in: sample } })
+            const data = <AllChat[]>await this.chatModel.find({ connection: { $in: details } })
             return data
         } catch (error) {
             console.log(error);
