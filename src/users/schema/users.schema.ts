@@ -57,6 +57,9 @@ export class Users extends mongoose.Document {
   @Prop()
   feedback: string;
 
+  @Prop()
+  notification: number
+
   @Prop({ type: Boolean, default: false })
   access: Boolean;
 

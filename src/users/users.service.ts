@@ -139,7 +139,8 @@ export class UsersService {
             caloriesBurn: details.calorieBurn,
             caloriesNeed: details.calorieNeed,
             isUpload: true,
-            imageUrl: ''
+            imageUrl: '',
+            notification: 0
           },
         }
       );

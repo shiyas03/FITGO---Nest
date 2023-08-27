@@ -27,8 +27,8 @@ export class ChatController {
     }
 
     @Patch('seen')
-    async updateMeesageSeen(@Body() data: { connectionId: string }) {
-        return await this.chatService.updateMessageSeen(data.connectionId)
+    async updateUserMeesageSeen(@Body() data: { senderId: string, connectionId: string }) {
+        return await this.chatService.updateMessageSeen(data)
     }
 
 }

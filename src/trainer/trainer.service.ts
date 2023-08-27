@@ -269,16 +269,4 @@ export class TrainerService {
     }
   }
 
-  async changeNotification(trainerId: string):Promise<boolean> {
-    try {
-      const update = await this.trainerModel.updateOne({ _id: trainerId }, { $set: { notification: 0 } }, { new: true })
-      if (update.modifiedCount == 1) {
-        return true
-      }
-      return false
-    } catch (error) {
-      console.log(error.message);
-      throw new Error(error)
-    }
-  }
 }

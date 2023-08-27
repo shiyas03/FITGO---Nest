@@ -109,9 +109,4 @@ export class TrainerController {
         return await this.trainerServices.uploadReview(data, id)
     }
 
-    @Patch('notification')
-    async chageNotification(@Body() data: { trainerId: string }) {
-        return await this.trainerServices.changeNotification(data.trainerId)
-    }
-
 }
