@@ -50,11 +50,15 @@ export class PaymentService {
   async paymentStatus(session_id: string): Promise<boolean> {
     try {
       if (session_id) {
+        let status = false
         const checkoutSession = await this.stripe.checkout.sessions.retrieve(session_id)
         const { amount, userId, trainerId, packageId } = checkoutSession.metadata;
         const period = <number>amount < 600 ? 30 : amount > 7000 ? 360 : 180
         const currentDate = new Date()
         const newDate = currentDate.setDate(currentDate.getDate() + period)
+        if(checkoutSession.status === 'complete') {
+          status = true
+        }
         const newPayment = new this.paymentModel({
           amount: amount,
           userId: userId,
@@ -64,10 +68,18 @@ export class PaymentService {
           expiryDate: newDate,
           sessionId: session_id,
           user_status: checkoutSession.status,
-          trainer_status: false,
+          trainer_status: status,
         })
         if (checkoutSession.status === 'complete') {
           await newPayment.save()
+          const newAmount = Math.abs(amount * 0.6)
+          const details = {
+            date: new Date(),
+            amount: newAmount
+          }
+          await this.trainerModel.updateOne({ _id: trainerId }, {
+            $push: { payments: details }
+          }, { new: true })
           return true
         } else {
           return false
@@ -126,31 +138,6 @@ export class PaymentService {
       }
     } catch (error) {
       console.log(error.message);
-      throw new Error(error)
-    }
-  }
-
-  async payToTrainer(trainerId: string): Promise<boolean> {
-    try {
-      const data = await this.paymentModel.findOneAndUpdate({ trainerId: trainerId }, {
-        $set: {
-          trainer_status: true
-        }
-      });
-      if (data) {
-        const newAmount = Math.abs(data.amount * 0.6)
-        const details = {
-          date: new Date(),
-          amount: newAmount
-        }
-        await this.trainerModel.updateOne({ _id: trainerId }, {
-          $push: { payments: details }
-        }, { new: true })
-        return true
-      }
-      return false
-    } catch (error) {
-      console.log(error);
       throw new Error(error)
     }
   }

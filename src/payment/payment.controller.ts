@@ -32,9 +32,5 @@ export class PaymentController {
         return this.paymentService.fetchTrainerPayments(trainer_id)
     }
 
-    @Patch('pay_to_trainer')
-    async  payToTrainer(@Body() data:{trainerId:string}){
-        return this.paymentService.payToTrainer(data.trainerId)
-    }
 }
 

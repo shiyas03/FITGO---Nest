@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { Users } from "./schema/users.schema";
-import { Login, PaymentData, UpdateDetails, UserDetails } from "./user.interface";
+import { Login, UpdateDetails, UserDetails } from "./user.interface";
 import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("")
@@ -26,32 +26,32 @@ export class UsersController {
 
   @Post("mail")
   async sendMail(@Body() data: { email: string }) {
-    return this.userService.sendMail(data.email);
+    return await this.userService.sendMail(data.email);
   }
 
   @Get("user")
   async fetchUser(@Query("id") id: string) {
-    return this.userService.fetchUser(id);
+    return await this.userService.fetchUser(id);
   }
 
   @Post("verify")
   async verifyOtp(@Body() user: Users) {
-    return this.userService.verify(user);
+    return await this.userService.verify(user);
   }
 
   @Post("user-details")
   async userDetails(@Body() details: UserDetails) {
-    return this.userService.userDetails(details);
+    return await this.userService.userDetails(details);
   }
 
   @Post("login")
   async verifyLogin(@Body() details: Login) {
-    return this.userService.verifyLogin(details);
+    return await this.userService.verifyLogin(details);
   }
 
   @Get("profile/:id")
   async fetchProfileDetails(@Param('id') id: string) {
-    return this.userService.fetchProfileDetails(id);
+    return await this.userService.fetchProfileDetails(id);
   }
 
   @Patch("profileImage")
@@ -60,17 +60,17 @@ export class UsersController {
     @Query() id: string,
     @UploadedFile() profile: Express.Multer.File
   ) {
-    return this.userService.uploadProfile(profile, id);
+    return await this.userService.uploadProfile(profile, id);
   }
 
   @Patch("image-remove")
   async removeProfileImage(@Body() id: string) {
-    return this.userService.removeProfileImage(id);
+    return await this.userService.removeProfileImage(id);
   }
 
   @Put("update-details")
   async updateDetails(@Body() details: UpdateDetails, @Query() id: string) {
-    return this.userService.updateDetails(details, id);
+    return await this.userService.updateDetails(details, id);
   }
 
 }

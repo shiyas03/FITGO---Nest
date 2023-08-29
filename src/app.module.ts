@@ -13,6 +13,7 @@ import { WorkoutsModule } from './workouts/workouts.module';
 import { PaymentModule } from './payment/payment.module';
 import { ConfigModule } from "@nestjs/config";
 import { ChatModule } from './chat/chat.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ChatModule } from './chat/chat.module';
       secret: "jwtSecretKey",
       signOptions: { expiresIn: "7d" },
     }),
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [AppService],
