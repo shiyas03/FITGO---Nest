@@ -1,16 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { paymentModel } from './schema/schema';
-import mongoose, { Model, trusted } from 'mongoose';
-import { Payment, PaymentData, PaymentDetails } from './payment.interface';
+import mongoose, { Model } from 'mongoose';
+import { Invoice, Payment, PaymentDetails } from './payment.interface';
 import Stripe from 'stripe';
 import { TrainerModel } from 'src/trainer/schema/trainer.schema';
+import * as handlebars from "handlebars";
+import { MailerService } from '@nestjs-modules/mailer';
+import * as fs from "fs";
 
 @Injectable()
 export class PaymentService {
 
   private readonly stripe
-  constructor(@InjectModel("Payments") private paymentModel: Model<paymentModel>, @InjectModel("Trainer") private trainerModel: Model<TrainerModel>,) {
+  constructor(@InjectModel("Payments") private paymentModel: Model<paymentModel>,
+    @InjectModel("Trainer") private trainerModel: Model<TrainerModel>,
+    private readonly mailService: MailerService,) {
     this.stripe = new Stripe("sk_test_51NaG9bSJ8tM5mOcsqEmQol0W0hRvzVcV3OaPiAkTfb2u2TPSZp83l4hx3SgOAVplhxWck3DQLf5dbw0LDccKG6mS00EtQwsUrE", {
       apiVersion: '2022-11-15',
       appInfo: {
@@ -56,7 +61,7 @@ export class PaymentService {
         const period = <number>amount < 600 ? 30 : amount > 7000 ? 360 : 180
         const currentDate = new Date()
         const newDate = currentDate.setDate(currentDate.getDate() + period)
-        if(checkoutSession.status === 'complete') {
+        if (checkoutSession.status === 'complete') {
           status = true
         }
         const newPayment = new this.paymentModel({
@@ -72,6 +77,13 @@ export class PaymentService {
         })
         if (checkoutSession.status === 'complete') {
           await newPayment.save()
+          const invoice = {
+            email: checkoutSession.customer_details.email,
+            name: checkoutSession.customer_details.name,
+            invoiceId: checkoutSession.invoice,
+            amount: checkoutSession.metadata.amount
+          }
+          this.sendEmail(invoice)
           const newAmount = Math.abs(amount * 0.6)
           const details = {
             date: new Date(),
@@ -89,6 +101,22 @@ export class PaymentService {
       console.log(error.message);
       throw new Error(error)
     }
+  }
+
+  async sendEmail(data: Invoice) {
+    let template: HandlebarsTemplateDelegate<{ data: Invoice }>;
+    const templatePath = "src/helpers/mail-templates/payment-template.hbs";
+    const templateContent = fs.readFileSync(templatePath, "utf8");
+    template = handlebars.compile(templateContent);
+
+    const htmlContent = template({ data: data });
+    await this.mailService.sendMail({
+      to: data.email,
+      from: "ffitgo@gmail.com",
+      subject: "Payment Received for Your FitGo Fitness Membership",
+      text: "Hello Greetings!",
+      html: htmlContent,
+    });
   }
 
   async fetchPayments(userId: string): Promise<PaymentDetails[]> {

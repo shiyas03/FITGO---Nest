@@ -51,3 +51,10 @@ export interface PaymentDetails {
   trainerId: fetchTrainers;
   status: string;
 }
+
+export interface Invoice {
+  email: string;
+  name: string;
+  invoiceId: string;
+  amount: number
+}
