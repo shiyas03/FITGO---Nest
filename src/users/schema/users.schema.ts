@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document, Schema as MongooseSchema } from "mongoose";
+import { Workout } from "src/workouts/workouts.interface";
+import { WorkInfo, WorkInfoSchema } from "./work.schema";
 
 export type userDocument = Users & Document;
 
@@ -65,6 +67,9 @@ export class Users extends mongoose.Document {
 
   @Prop({ default: Date.now })
   joinDate: Date;
+
+  @Prop({ type: [WorkInfoSchema] })
+  workouts: WorkInfo[]
 
 }
 

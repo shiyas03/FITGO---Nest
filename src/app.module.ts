@@ -11,32 +11,33 @@ import { JwtMiddleware } from "./helpers/middleware/jwt.middleware";
 import { JwtModule } from "@nestjs/jwt";
 import { WorkoutsModule } from './workouts/workouts.module';
 import { PaymentModule } from './payment/payment.module';
-import { ConfigModule } from "@nestjs/config";
 import { ChatModule } from './chat/chat.module';
 import { ContactModule } from './contact/contact.module';
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 @Module({
   imports: [
-    UsersModule,
+    UsersModule, 
     TrainerModule,
     BlogsModule,
     AdminModule,
     WorkoutsModule,
     PaymentModule,
     ChatModule,
-    MongooseModule.forRoot("mongodb://localhost:27017/fitness"),
+    MongooseModule.forRoot(process.env.MONOGODB_ATLAS),
     MailerModule.forRoot({
       transport: {
         host: "smtp.gmail.com",
         auth: {
           user: "ffitgo@gmail.com",
-          pass: "zgccaqpwsjigjykc",
+          pass: process.env.EMAIL_PASS,
         },
       },
     }),
     JwtModule.register({
       global: true,
-      secret: "jwtSecretKey",
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: "7d" },
     }),
     ContactModule,

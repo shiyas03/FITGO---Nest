@@ -158,7 +158,7 @@ export class UsersService {
   async verifyLogin(details: Login): Promise<LoginReturn> {
     try {
       const data = await this.userModel.findOne({
-        email: { $regex: new RegExp("^" + details.email + "$", "i") },
+        email: { $regex: new RegExp("^" + details.loginEmail + "$", "i") },
       });
       if (data) {
         if (data.isUpload === true && data.access === false) {
@@ -169,7 +169,7 @@ export class UsersService {
             const token = await this.jwtService.signAsync(paylaod);
             const verifyPass = await argon.verify(
               data.password,
-              details.password
+              details.loginPassword
             );
             return verifyPass
               ? { token: token }
@@ -190,7 +190,7 @@ export class UsersService {
         await this.userModel.findOne(
           { _id: id },
           { password: 0, access: 0, __v: 0 }
-        )
+        ).populate({path: 'workouts.workouts',  model: 'Workouts'})
       );
       if (data) {
         return data;
@@ -271,6 +271,23 @@ export class UsersService {
       }
     } catch (error) {
       console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async updateWorkouts(userId: string, workoutId: string): Promise<boolean> {
+    try {
+      const data = {
+        workouts: workoutId,
+        date: Date.now()
+      }
+      const update = await this.userModel.updateOne({ _id: userId }, { $push: { workouts: data } })
+      if (update.modifiedCount == 1) {
+        return true
+      }
+      return false
+    } catch (error) {
+      console.log(error.message);
       throw new Error(error);
     }
   }

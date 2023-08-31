@@ -73,4 +73,8 @@ export class UsersController {
     return await this.userService.updateDetails(details, id);
   }
 
+  @Put('workouts')
+  async updateWorkouts(@Body() data: { userId: string, workoutId: string }) {
+    return await this.userService.updateWorkouts(data.userId, data.workoutId)
+  }
 }

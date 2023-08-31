@@ -4,6 +4,8 @@ import { PaymentService } from './payment.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { paymentSchema } from './schema/schema';
 import { TrainerSchema } from '../trainer/schema/trainer.schema';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Module({
   imports:[

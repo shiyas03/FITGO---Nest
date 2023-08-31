@@ -5,6 +5,8 @@ import { ChatController } from './chat.controller';
 import { ChatSchema } from './schema/chat.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConnectionSchema } from './schema/chat.connection';
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 @Module({
   imports: [

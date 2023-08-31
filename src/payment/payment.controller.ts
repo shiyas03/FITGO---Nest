@@ -22,7 +22,7 @@ export class PaymentController {
         return this.paymentService.fetchPayments(user_id)
     }
 
-    @Get('get_all')
+    @Get('fetch_all')
     async fetchAllPayments() {
         return this.paymentService.fetchAllPayments()
     }

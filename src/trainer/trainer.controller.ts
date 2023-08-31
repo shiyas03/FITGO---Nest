@@ -12,13 +12,12 @@ import {
     Res,
     Put
 } from '@nestjs/common';
-import { TrainerService } from './trainer.service';
+import { TrainerService } from './trainer.service'; 
 import { Register, Trainer, Update } from './trainer.interface';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { cropImage } from '../helpers/multer/multer.config';
 import { Response } from 'express';
 import { join } from 'path';
-import { ObjectId } from 'mongoose';
 
 @Controller('trainer')
 export class TrainerController {

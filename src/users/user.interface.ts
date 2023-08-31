@@ -1,3 +1,4 @@
+import { Workout } from "src/workouts/workouts.interface";
 
 export interface UserDetails {
     age: number;
@@ -21,8 +22,8 @@ export interface Register {
 }
 
 export interface Login {
-    email: string;
-    password: string;
+    loginEmail: string;
+    loginPassword: string;
 }
 
 export interface RegisterReturn {
@@ -44,6 +45,12 @@ export interface UserData {
     imageUrl: string;
 }
 
+interface works {
+    _id: string
+    workouts: Workout;
+    date: Date
+}
+
 export interface Profile {
     _id:string;
     name: string;
@@ -62,6 +69,7 @@ export interface Profile {
     imageUrl:string;
     isUpload?:boolean;
     joinDate?:Date
+    workouts:works[]
 }
 
 export interface UpdateDetails{

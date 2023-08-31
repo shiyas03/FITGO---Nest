@@ -8,6 +8,9 @@ import { TrainerModel } from 'src/trainer/schema/trainer.schema';
 import * as handlebars from "handlebars";
 import { MailerService } from '@nestjs-modules/mailer';
 import * as fs from "fs";
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 
 @Injectable()
 export class PaymentService {
@@ -16,7 +19,7 @@ export class PaymentService {
   constructor(@InjectModel("Payments") private paymentModel: Model<paymentModel>,
     @InjectModel("Trainer") private trainerModel: Model<TrainerModel>,
     private readonly mailService: MailerService,) {
-    this.stripe = new Stripe("sk_test_51NaG9bSJ8tM5mOcsqEmQol0W0hRvzVcV3OaPiAkTfb2u2TPSZp83l4hx3SgOAVplhxWck3DQLf5dbw0LDccKG6mS00EtQwsUrE", {
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2022-11-15',
       appInfo: {
         name: "fitgo-fitness",
@@ -41,8 +44,8 @@ export class PaymentService {
           trainerId: data.trainerId,
           packageId: data.packageId
         },
-        success_url: `${'http://localhost:4200'}/trainers/view?session_id={CHECKOUT_SESSION_ID}&trainer_id=${data.trainerId}`,
-        cancel_url: `${'http://localhost:4200'}/trainers/view?&trainer_id=${data.trainerId}`,
+        success_url: `${process.env.FRONT_END_API}/trainers/view?session_id={CHECKOUT_SESSION_ID}&trainer_id=${data.trainerId}`,
+        cancel_url: `${process.env.FRONT_END_API}/trainers/view?&trainer_id=${data.trainerId}`,
         // automatic_tax: { enabled: true }
       });
       return session
