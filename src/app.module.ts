@@ -28,9 +28,9 @@ dotenv.config()
     MongooseModule.forRoot(process.env.MONOGODB_ATLAS),
     MailerModule.forRoot({
       transport: {
-        host: "smtp.gmail.com",
+        host: process.env.EMAIL_HOST,
         auth: {
-          user: "ffitgo@gmail.com",
+          user: process.env.EMAIL_MAIL,
           pass: process.env.EMAIL_PASS,
         },
       },
