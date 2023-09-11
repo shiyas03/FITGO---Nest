@@ -53,7 +53,7 @@ export class AppModule implements NestModule {
         { path: '/login', method: RequestMethod.POST },
         { path: '/register', method: RequestMethod.POST },
         { path: '/mail', method: RequestMethod.POST },
-        { path: '/verify-otp', method: RequestMethod.POST },
+        { path: '/verify', method: RequestMethod.POST },
         { path: '/user-details', method: RequestMethod.POST },
         { path: '/admin/login', method: RequestMethod.POST },
         { path: '/trainer/login', method: RequestMethod.POST },

@@ -157,8 +157,9 @@ export class UsersService {
 
   async verifyLogin(details: Login): Promise<LoginReturn> {
     try {
+      const email = details.loginEmail
       const data = await this.userModel.findOne({
-        email: { $regex: new RegExp("^" + details.loginEmail + "$", "i") },
+        email: { $regex: new RegExp("^" + email + "$", "i") },
       });
       if (data) {
         if (data.isUpload === true && data.access === false) {
